@@ -1,0 +1,48 @@
+.operation {
+    .error {
+        color: #ff0000;
+    }
+
+    :global(.oi) {
+        cursor: pointer;
+        &:hover {
+            color: green;
+        }
+        &.star {
+            color: green;
+        }
+    }
+}
+
+.pagination {
+    display: flex;
+
+    span {
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+        border: 1px solid #cccccc;
+        text-align: center;
+        cursor: pointer;
+
+        &:not(first-child) {
+            margin-left: 5px;
+        }
+
+        &:hover {
+            background: #999999;
+            border: 1px solid #999999;
+        }
+
+        &.selected {
+            color: #ffffff;
+            border: 1px solid #666666;
+            background: #666666;
+        }
+    }
+}
+
+.accept {
+    cursor: pointer;
+    color: #ff0000;
+}

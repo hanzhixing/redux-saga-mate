@@ -1,0 +1,75 @@
+{
+  "name": "redux-saga-mate",
+  "version": "0.1.0",
+  "description": "Yet another solution which reduce boilerplates in your code.",
+  "keywords": [
+    "react",
+    "redux",
+    "react-redux",
+    "redux-saga"
+  ],
+  "author": "Zhixing Han <zhixing.han.0409@gmail.com>",
+  "license": "ISC",
+  "main": "lib/index.js",
+  "module": "esm/index.js",
+  "files": [
+    "dist",
+    "esm",
+    "lib",
+    "src"
+  ],
+  "browserslist": [
+    ">1%",
+    "last 4 versions",
+    "Firefox ESR",
+    "not ie < 11"
+  ],
+  "scripts": {
+    "clean:commonjs": "rimraf lib",
+    "clean:umd": "rimraf dist",
+    "build:commonjs": "cross-env BABEL_OUTPUT=commonjs babel src/ --out-dir lib/ --ignore **/__tests__,**/__mocks__",
+    "build:esm": "babel src/ --out-dir esm/ --ignore **/__tests__,**/__mocks__",
+    "build:umd": "rollup -c",
+    "build": "npm-run-all clean:* --parallel build:*"
+  },
+  "dependencies": {
+    "errio": "^1.2.2",
+    "flux-standard-action": "^2.0.3",
+    "json-stable-stringify": "^1.0.1",
+    "ramda": "^0.26.1",
+    "react": "^16.7.0",
+    "recompose": "^0.30.0",
+    "redux-actions": "^2.6.4",
+    "redux-saga": "^1.0.0",
+    "reselect": "^4.0.0",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.2.2",
+    "@babel/plugin-proposal-class-properties": "^7.3.0",
+    "@babel/plugin-proposal-export-default-from": "^7.2.0",
+    "@babel/plugin-proposal-export-namespace-from": "^7.2.0",
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
+    "@babel/preset-env": "^7.3.1",
+    "browserslist": "^4.4.1",
+    "cross-env": "^5.2.0",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^2.6.3",
+    "rollup": "^1.1.2",
+    "rollup-plugin-babel": "^4.3.2",
+    "rollup-plugin-commonjs": "^9.2.0",
+    "rollup-plugin-ignore": "^1.0.4",
+    "rollup-plugin-node-resolve": "^4.0.0",
+    "rollup-plugin-replace": "^2.1.0",
+    "rollup-plugin-terser": "^4.0.3",
+    "rollup-plugin-uglify": "^6.0.2"
+  },
+  "peerDependencies": {
+    "react": "^16",
+    "redux-saga": "^0.16 || ^1",
+    "recompose": ">=0.30",
+    "reselect": "^4",
+    "redux-actions": "^2"
+  }
+}
