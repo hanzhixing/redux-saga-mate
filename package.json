@@ -1,6 +1,6 @@
 {
   "name": "redux-saga-mate",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Allow you building react and redux based web apps with less pain.",
   "keywords": [
     "react",
@@ -8,6 +8,10 @@
     "react-redux",
     "redux-saga"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hanzhixing/redux-saga-mate.git"
+  },
   "author": "Zhixing Han <zhixing.han.0409@gmail.com>",
   "license": "ISC",
   "main": "lib/index.js",
