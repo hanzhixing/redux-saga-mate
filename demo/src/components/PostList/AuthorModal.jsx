@@ -5,7 +5,7 @@ ReactModal.setAppElement(document.body);
 
 export default ({isLoading, fullName, onCloseAuthorModal}) => (
     <ReactModal
-        isOpen={isLoading !== undefined}
+        isOpen={true}
         contentLabel="Author Infomation"
         style={{
             content: {

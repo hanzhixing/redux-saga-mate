@@ -38,6 +38,7 @@ const mapDispatchToProps = (dispatch, props) => ({
             postId: id,
         })));
         props.onTrackAsyncAction('onViewAuthor', actionId);
+        props.onViewAuthor(id);
     },
     onClearStarLoading: id => {
         props.onUntrackAsyncAction(['onStar', id]);

@@ -5,7 +5,8 @@ import MaybeDataRows from '../../connects/PostList/MaybeDataRows';
 import MaybeBuffer from '../../connects/PostList/MaybeBuffer';
 
 export default ({
-    modalAuthor,
+    modalPostAuthor,
+    modalAuthorInfo,
     page,
     selected,
     onPage,
@@ -16,6 +17,7 @@ export default ({
     transients,
     onTrackAsyncAction,
     onUntrackAsyncAction,
+    onViewAuthor,
 }) => (
     <div className="mx-auto" style={{marginTop: '50px', width: '1200px'}}>
         <table className="table table-md">
@@ -37,12 +39,13 @@ export default ({
                     onToggleCheck={onToggleCheck}
                     onTrackAsyncAction={onTrackAsyncAction}
                     onUntrackAsyncAction={onUntrackAsyncAction}
+                    onViewAuthor={onViewAuthor}
                 />
                 <MaybeBuffer page={page} transients={transients} />
             </tbody>
         </table>
         <div><button onClick={onBatchStar}>Star selected</button><br /><br /></div>
         <Pager onPage={onPage} page={page} />
-        {!!modalAuthor && (<AuthorModal {...modalAuthor} onCloseAuthorModal={onCloseAuthorModal} />)}
+        {!!modalPostAuthor && (<AuthorModal {...modalAuthorInfo} onCloseAuthorModal={onCloseAuthorModal} />)}
     </div>
 );

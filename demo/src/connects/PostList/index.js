@@ -1,7 +1,6 @@
 import {connect} from 'react-redux';
 import {compose, lifecycle, withState} from 'recompose';
 import {createSelector} from 'reselect';
-import {createAction} from 'redux-actions';
 import {createAsyncAction, idOfAction} from 'redux-saga-mate/lib/action';
 import {withAsyncActionTrack} from 'redux-saga-mate/lib/hoc';
 import {selectActions} from 'redux-saga-mate/lib/selector';
@@ -15,11 +14,11 @@ const makeSelectProps = () => createSelector(
     selectPostsBuffer,
     selectActions,
     selectModalAuthor,
-    (posts, buffer, transients, modalAuthor) => ({
+    (posts, buffer, transients, modalAuthorInfo) => ({
         items: posts,
         buffer,
         transients,
-        modalAuthor,
+        modalAuthorInfo,
     }),
 );
 
@@ -37,8 +36,7 @@ const mapDispatchToProps = (dispatch, props) => ({
         props.onTrackAsyncAction(['onPage', page], actionId);
     },
     onCloseAuthorModal: () => {
-        props.onUntrackAsyncAction('onViewAuthor');
-        dispatch(createAction(ActionTypes.CLEANUP)(props.actionIds.onViewAuthor));
+        props.setModalPostAuthor(undefined);
     },
     onBatchStar: () => {
         props.selected.forEach(id => {
@@ -52,6 +50,9 @@ const mapDispatchToProps = (dispatch, props) => ({
         } else {
             props.setSelected([...props.selected, id]);
         }
+    },
+    onViewAuthor: id => {
+        props.setModalPostAuthor(id);
     },
 });
 
@@ -68,6 +69,7 @@ const withLifecycle = lifecycle({
 const withLiftedStates = compose(
     withState('selected', 'setSelected', []),
     withState('page', 'setPage', 1),
+    withState('modalPostAuthor', 'setModalPostAuthor', undefined),
 );
 
 export default compose(withLiftedStates, withAsyncActionTrack, withRedux, withLifecycle)(PostList);

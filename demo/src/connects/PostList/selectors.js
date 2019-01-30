@@ -4,6 +4,7 @@ import {selectActions} from 'redux-saga-mate/lib/selector';
 
 export const selectPostIds = (state, props) => get(['ui', 'posts', props.page, 'ids'], state);
 export const selectBufferPostIds = (state, props) => get(['ui', 'posts', props.page, 'buffer'], state);
+export const selectModalPost = (state, props) => get([props.modalPostAuthor], state.entities.posts);
 
 export const selectUsers = (state, props) => state.entities.users;
 
@@ -34,22 +35,19 @@ export const selectPostsBuffer = createSelector(
 );
 
 export const selectModalAuthor = createSelector(
+    selectModalPost,
+    selectUsers,
     selectActions,
-    actions => {
-        if (!actions.onViewAuthor) {
-            return undefined;
-        }
-        const {isLoading} = actions.onViewAuthor;
+    (post, users, actions) => {
+        const {isLoading} = actions.onViewAuthor ? actions.onViewAuthor : {isLoading: undefined};
 
         if (isLoading) {
             return {isLoading};
         }
 
-        const {response: {result, entities: {users}}} = actions.onViewAuthor.payload;
-
         return {
             isLoading,
-            ...users[result]
+            ...post ? get([post.author], users) : {},
         };
     },
 );
