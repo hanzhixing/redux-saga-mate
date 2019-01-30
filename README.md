@@ -16,6 +16,9 @@ Allow you building react and redux based web apps with less pain, by removing th
 * Track async action states in `store`, it also means your components are fully **`controlled components`**, the states and callbacks(handlers) are all passed as props.
 * Infomation synchronisation is the most difficult part in the computer science, `normalization` strategy is mean to solve this problem, even if that may not work perfectly. I hope you know how to use the `normalizr` library.
 
+## Demo
+https://hanzhixing.github.io/redux-saga-mate/
+
 ## Installation
 
 Install the package.To use with node:

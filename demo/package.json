@@ -2,6 +2,7 @@
   "name": "demo",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://hanzhixing.github.io/redux-saga-mate/",
   "dependencies": {
     "bootstrap": "^4.2.1",
     "classnames": "^2.2.6",
@@ -22,6 +23,7 @@
     "redux-saga": "^1.0.0"
   },
   "scripts": {
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -35,5 +37,8 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "devDependencies": {
+    "gh-pages": "^2.0.1"
+  }
 }
