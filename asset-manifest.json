@@ -1,16 +1,16 @@
 {
   "main.css": "/redux-saga-mate/static/css/main.f6660e9a.chunk.css",
-  "main.js": "/redux-saga-mate/static/js/main.ed97687e.chunk.js",
-  "main.js.map": "/redux-saga-mate/static/js/main.ed97687e.chunk.js.map",
+  "main.js": "/redux-saga-mate/static/js/main.01faeefc.chunk.js",
+  "main.js.map": "/redux-saga-mate/static/js/main.01faeefc.chunk.js.map",
   "static/css/1.89ca9337.chunk.css": "/redux-saga-mate/static/css/1.89ca9337.chunk.css",
-  "static/js/1.34845294.chunk.js": "/redux-saga-mate/static/js/1.34845294.chunk.js",
-  "static/js/1.34845294.chunk.js.map": "/redux-saga-mate/static/js/1.34845294.chunk.js.map",
+  "static/js/1.22582f32.chunk.js": "/redux-saga-mate/static/js/1.22582f32.chunk.js",
+  "static/js/1.22582f32.chunk.js.map": "/redux-saga-mate/static/js/1.22582f32.chunk.js.map",
   "runtime~main.js": "/redux-saga-mate/static/js/runtime~main.e5b620bb.js",
   "runtime~main.js.map": "/redux-saga-mate/static/js/runtime~main.e5b620bb.js.map",
   "static/media/open-iconic-bootstrap.css": "/redux-saga-mate/static/media/open-iconic.527eff64.otf",
   "static/css/main.f6660e9a.chunk.css.map": "/redux-saga-mate/static/css/main.f6660e9a.chunk.css.map",
   "static/css/1.89ca9337.chunk.css.map": "/redux-saga-mate/static/css/1.89ca9337.chunk.css.map",
   "index.html": "/redux-saga-mate/index.html",
-  "precache-manifest.a2a35337994a3bcaf1be1c6258eb5ca8.js": "/redux-saga-mate/precache-manifest.a2a35337994a3bcaf1be1c6258eb5ca8.js",
+  "precache-manifest.25b9031516ff15e947d189b7cece33d2.js": "/redux-saga-mate/precache-manifest.25b9031516ff15e947d189b7cece33d2.js",
   "service-worker.js": "/redux-saga-mate/service-worker.js"
 }
