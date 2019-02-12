@@ -4,24 +4,24 @@ self.__precacheManifest = [
     "url": "/redux-saga-mate/static/media/open-iconic.3cf97837.woff"
   },
   {
-    "revision": "01faeefc58e0e55cb4b9",
-    "url": "/redux-saga-mate/static/css/main.f6660e9a.chunk.css"
+    "revision": "d01afb313fc7b2beb0cb",
+    "url": "/redux-saga-mate/static/css/main.59f497e6.chunk.css"
   },
   {
     "revision": "eca2c26759a009a4a9361151efe99e74",
     "url": "/redux-saga-mate/static/media/open-iconic.eca2c267.svg"
   },
   {
-    "revision": "22582f321c09b478a53c",
-    "url": "/redux-saga-mate/static/js/1.22582f32.chunk.js"
+    "revision": "da8471affcf58ff455be",
+    "url": "/redux-saga-mate/static/js/1.da8471af.chunk.js"
   },
   {
     "revision": "e5b620bb3b6f609a12cd",
     "url": "/redux-saga-mate/static/js/runtime~main.e5b620bb.js"
   },
   {
-    "revision": "01faeefc58e0e55cb4b9",
-    "url": "/redux-saga-mate/static/js/main.01faeefc.chunk.js"
+    "revision": "d01afb313fc7b2beb0cb",
+    "url": "/redux-saga-mate/static/js/main.d01afb31.chunk.js"
   },
   {
     "revision": "527eff645d8ead16666afb6931041279",
@@ -36,11 +36,11 @@ self.__precacheManifest = [
     "url": "/redux-saga-mate/static/media/open-iconic.93cc7aa6.ttf"
   },
   {
-    "revision": "22582f321c09b478a53c",
-    "url": "/redux-saga-mate/static/css/1.89ca9337.chunk.css"
+    "revision": "da8471affcf58ff455be",
+    "url": "/redux-saga-mate/static/css/1.f6aeda5e.chunk.css"
   },
   {
-    "revision": "555a74611f74108c34576393bfb1825b",
+    "revision": "f3ce229ac75bd0b683f4a2907bd99932",
     "url": "/redux-saga-mate/index.html"
   }
 ];
