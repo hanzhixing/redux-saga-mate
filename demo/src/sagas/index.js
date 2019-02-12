@@ -1,5 +1,5 @@
 import {all, takeEvery} from 'redux-saga/effects';
-import {makeCreateDefaultWorker} from 'redux-saga-mate/lib/saga';
+import {makeCreateDefaultWorker} from 'redux-saga-mate/src/saga';
 import {MyError} from '../api/errors';
 import * as ActionTypes from '../actions/types';
 import * as Api from '../api';

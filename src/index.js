@@ -1,5 +1,5 @@
 import {createAsyncAction, makeActionAsync, idOfAction, isFinished, continueWith, succeedWith, failWith} from './action';
-import {withAsyncActionTrack} from './hoc';
+import {withAsyncActionStateHandler} from './hoc';
 import {UPDATE, DELETE} from './operation';
 import {createActionsReducer, createEntitiesReducer, groupByComposeByEntityType} from './reducer';
 import {makeCreateDefaultWorker} from './saga';
@@ -13,7 +13,7 @@ export default {
     continueWith,
     succeedWith,
     failWith,
-    withAsyncActionTrack,
+    withAsyncActionStateHandler,
     Operations: {
         UPDATE,
         DELETE,

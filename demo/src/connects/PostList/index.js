@@ -1,9 +1,9 @@
 import {connect} from 'react-redux';
 import {compose, lifecycle, withState} from 'recompose';
 import {createSelector} from 'reselect';
-import {createAsyncAction, idOfAction} from 'redux-saga-mate/lib/action';
-import {withAsyncActionTrack} from 'redux-saga-mate/lib/hoc';
-import {selectActions} from 'redux-saga-mate/lib/selector';
+import {createAsyncAction, idOfAction} from 'redux-saga-mate/src/action';
+import {withAsyncActionStateHandler} from 'redux-saga-mate/src/hoc';
+import {selectActions} from 'redux-saga-mate/src/selector';
 import {delay} from '../../utils';
 import PostList from '../../components/PostList';
 import {selectPosts, selectPostsBuffer, selectModalAuthor} from './selectors';
@@ -72,4 +72,10 @@ const withLiftedStates = compose(
     withState('modalPostAuthor', 'setModalPostAuthor', undefined),
 );
 
-export default compose(withLiftedStates, withAsyncActionTrack, withRedux, withLifecycle)(PostList);
+const withAsyncAction = withAsyncActionStateHandler(({actionIds, setActionId, unsetActionId}) => ({
+    actionIds,
+    onTrackAsyncAction: setActionId,
+    onUntrackAsyncAction: unsetActionId,
+}));
+
+export default compose(withLiftedStates, withAsyncAction, withRedux, withLifecycle)(PostList);

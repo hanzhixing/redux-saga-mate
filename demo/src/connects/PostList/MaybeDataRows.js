@@ -2,7 +2,7 @@ import {connect} from 'react-redux';
 import {compose, branch, renderComponent} from 'recompose';
 import {createSelector} from 'reselect';
 import {createAction} from 'redux-actions';
-import {createAsyncAction, idOfAction} from 'redux-saga-mate/lib/action';
+import {createAsyncAction, idOfAction} from 'redux-saga-mate/src/action';
 import Placeholder from '../../components/PostList/Placeholder';
 import Loading from '../../components/PostList/Loading';
 import NoData from '../../components/PostList/NoData';

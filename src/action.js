@@ -1,16 +1,13 @@
 import stringify from 'json-stable-stringify';
 import {createAction} from 'redux-actions';
 import {isFSA} from 'flux-standard-action';
-import set from 'ramda/src/set';
-import lensProp from 'ramda/src/lensProp';
-import lensPath from 'ramda/src/lensPath';
-import omit from 'ramda/src/omit';
-import uuidv4 from 'uuid/v4';
 import uuidv5 from 'uuid/v5';
 import {FluxStandardActionError} from './error';
 import {PHASE_GHOST, PHASE_WAITING, PHASE_RUNNING, PHASE_FINISH} from './phase';
 
-const UUID_NAMESPACE = uuidv4();
+const UUID_NULL = '00000000-0000-0000-0000-000000000000';
+
+const UUID_NAMESPACE = uuidv5(document.domain, UUID_NULL);
 
 export const idOfAction = action => {
     if (!isFSA(action)) {

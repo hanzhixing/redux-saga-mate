@@ -4,15 +4,15 @@ Allow you building react and redux based web apps with less pain, by removing th
 
 ## You should know before go on reading
 
-* `dispatch`, `action`, `reducer`, `store` is from the design of redux, you should never try to put these things in your UI layer.
+* `dispatch`, `action`, `reducer`, `store` are concepts from the design of redux, you should never try to put these things in your UI layer.
 * `action`s are about what happend, it's not about "what should be done", even if they were named in verbs.
 * It is `reducer`s' job, that about "what should be done" and "how it should be done".
 * The `container` files you put in the "containers" directory are not actual `container`s, they are just connecting logics, the actual `container`s created automatically by `connect(YourComponent)`, you can only see them in the browser's `Developer Tools`.
-* In most situations, you should try hard to prevent to put your JSX codes in your `container` files. Because they are about the UI.
+* In most situations, you should try hard to prevent putting JSX codes in the `container` files. Because they are about the UI.
 * `redux-thunk` changes the origin conceptual model of the `action`, by functions, and functions always about "what should be done", or "how it should be done".
 * The `action` is not equal to action types. **`Action Type` + `Action Payload` = `Action Instance`**.
-* Tutorials or documentations of `redux`, `redux-thunk`, `redux-saga`, tell you track the async action state **`by action type`**, this is not what you want, in most of the time. 
-* Actions you dispatched are always with payloads. Some infomations from payloads affect the final call like http requests and the response.
+* Tutorials or documentations of `redux`, `redux-thunk`, `redux-saga`, tell you track the async action state **`by action type`**, this is not what you want, in most of the time.
+* Actions you dispatch are always with payloads. Infomations in the payload affect the final call like http requests, and so the responses.
 * Track async action states in `store`, it also means your components are fully **`controlled components`**, the states and callbacks(handlers) are all passed as props.
 * Infomation synchronisation is the most difficult part in the computer science, `normalization` strategy is mean to solve this problem, even if that may not work perfectly. I hope you know how to use the `normalizr` library.
 
@@ -196,7 +196,7 @@ import {compose, lifecycle, withState} from 'recompose';
 import {createSelector} from 'reselect';
 import {createAction} from 'redux-actions';
 import {createAsyncAction, idOfAction} from 'redux-saga-mate/src/action';
-import {withAsyncActionTrack} from 'redux-saga-mate/src/hoc';
+import {withAsyncActionStateHandler} from 'redux-saga-mate/src/hoc';
 import {selectActions} from 'redux-saga-mate/src/selector';
 import PostList from '../../components/PostList';
 import {selectPosts, selectPostsBuffer, selectModalAuthor} from './selectors';
@@ -204,7 +204,7 @@ import * as ActionTypes from '../../actions/types';
 
 const makeSelectProps = () => createSelector(
     selectPosts,
-    selectActions, // Once your component is wrapped with 'withAsyncActionTrack', you can select out the actions
+    selectActions, // Once your component is wrapped with 'withAsyncActionStateHandler`, you can select out the actions
     (items, transients) => ({
         items: posts,
         transients, // in the ui component, you can examine the action by 'transients.onPage[page]'
@@ -219,7 +219,6 @@ const makeMapStateToProps = () => {
 
 const mapDispatchToProps = (dispatch, props) => ({
     onPage: page => {
-        props.setPage(page);
         // 1. Make your action Async with 'createAsyncAction'.
         // 2. dispatch it.
         // 3. take the action id with 'idOfAction'
@@ -234,10 +233,16 @@ const mapDispatchToProps = (dispatch, props) => ({
 
 const withRedux = connect(makeMapStateToProps, mapDispatchToProps);
 
+const withAsyncAction = withAsyncActionStateHandler(({actionIds, setActionId, unsetActionId}) => ({
+    actionIds,
+    onTrackAsyncAction: setActionId,
+    onUntrackAsyncAction: unsetActionId,
+}));
+
 export default compose(
     ...
-    withAsyncActionTrack, 
-    withRedux, 
+    withAsyncAction,
+    withRedux,
     ...
 )(PostList);
 ```
