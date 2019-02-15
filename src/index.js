@@ -3,7 +3,7 @@ import {withAsyncActionStateHandler} from './hoc';
 import {UPDATE, DELETE} from './operation';
 import {createActionsReducer, createEntitiesReducer, groupByComposeByEntityType} from './reducer';
 import {makeCreateDefaultWorker} from './saga';
-import {selectActions} from './selector';
+import {createSelectActions} from './selector';
 
 export default {
     createAsyncAction,
@@ -22,5 +22,5 @@ export default {
     createEntitiesReducer,
     groupByComposeByEntityType,
     makeCreateDefaultWorker,
-    selectActions,
+    createSelectActions,
 };

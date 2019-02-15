@@ -3,10 +3,9 @@ import {compose, lifecycle, withState} from 'recompose';
 import {createSelector} from 'reselect';
 import {createAsyncAction, idOfAction} from 'redux-saga-mate/src/action';
 import {withAsyncActionStateHandler} from 'redux-saga-mate/src/hoc';
-import {selectActions} from 'redux-saga-mate/src/selector';
 import {delay} from '../../utils';
 import PostList from '../../components/PostList';
-import {selectPosts, selectPostsBuffer, selectModalAuthor} from './selectors';
+import {selectActions, selectPosts, selectPostsBuffer, selectModalAuthor} from './selectors';
 import * as ActionTypes from '../../actions/types';
 
 const makeSelectProps = () => createSelector(
