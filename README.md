@@ -197,10 +197,15 @@ import {createSelector} from 'reselect';
 import {createAction} from 'redux-actions';
 import {createAsyncAction, idOfAction} from 'redux-saga-mate/src/action';
 import {withAsyncActionStateHandler} from 'redux-saga-mate/src/hoc';
-import {selectActions} from 'redux-saga-mate/src/selector';
+import {createSelectActions} from 'redux-saga-mate/src/selector';
 import PostList from '../../components/PostList';
 import {selectPosts, selectPostsBuffer, selectModalAuthor} from './selectors';
 import * as ActionTypes from '../../actions/types';
+
+const selectActions = createSelectActions(
+    (state, props) => state.actions, // provide actions selector from store
+    (state, props) => props.actionIds, // provide actionIds selector maybe from props
+);
 
 const makeSelectProps = () => createSelector(
     selectPosts,
