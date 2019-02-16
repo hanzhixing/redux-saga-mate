@@ -3,6 +3,32 @@
 Allow you building react and redux based web apps with less pain, by removing the needs for writing lots of action types, reducers.
 
 ## You should know before go on reading
+### Layers or Moments
+```bash
+ -----------------------------------------------------------------------------------
+|                             presentational components (UI, jsx)                   |       ^
+ -----------------------------------------------------------------------------------        |
+|                                container components (auto)                        |       |
+ -----------------------------------------------------------------------------------        |
+|               connects (react-redux connect() or recompose hoc) (js)              |       |
+ -----------------------------------------------------------------------------------        |
+|                                     selectors (js)                                |       |
+ -----------------------------------------------------------------------------------        |
+|                                redux store (state) (js)                           |       |
+ -----------------------------------------------------------------------------------        |
+|                                  redux reducers (js)                              |       |
+ -----------------------------------------------------------------------------------    data flow
+|                               redux action payloads (js)                          |       ^
+ -----------------------------------------------------------------------------------        |
+|                           front-end states normalization (js)                     |       |
+ -----------------------------------------------------------------------------------        |
+|                                  remote API calls (js)                            |       |
+ -----------------------------------------------------------------------------------        |
+|  Web API, WebSocket Endpoints (we do not know where the data come from) (unknown) |       |
+ -----------------------------------------------------------------------------------        |
+|            Server State (RDBMS, No-SQL, MQs, Cache, File, Calculated) (unknown)   |       |
+ -----------------------------------------------------------------------------------
+```
 
 * `dispatch`, `action`, `reducer`, `store` are concepts from the design of redux, you should never try to put these things in your UI layer.
 * `action`s are about what happend, it's not about "what should be done", even if they were named in verbs.
@@ -93,8 +119,43 @@ src/
     }
 }
 ```
+## Something about internal implementation
+### Action (enhanced FSA for async)
+```js
+{
+    type: 'YOUR_ACTION_TYPE',
+    payload: {...any infomation as object...},
+    error: true or false,
+    meta: { // this infomation will be managed automatically
+        id: uniq_hash(type + payload),
+        pid: parentOf(id), // not used yet
+        ctime: ISO8601,
+        utime: ISO8601,
+        phase: 'started'|'running'|'finished',
+        progress: integer between 1~100
 
-## Usage
+    }
+}
+```
+
+### Normalized payloads
+
+You must normalized your api data in the API layer, then it can be processed automatically.
+
+```js
+{
+    request: {
+        data: {...},    // for POST, PUT, PATCH body (should be plain object)
+        params: {...},  // hint: react-router params
+        query: {...},   // hint: querystring.parse(location.search)
+    },
+    response: {
+        ...normalize(data, schema), // see normalizr
+    }
+}
+```
+
+## Usage (Highly recommended you to read the source of demo)
 
 ### actions/type.js
 ```js

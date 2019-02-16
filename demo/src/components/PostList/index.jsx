@@ -13,8 +13,6 @@ export default ({
     onToggleCheck,
     onCloseAuthorModal,
     onBatchStar,
-    actionIds,
-    transients,
     onTrackAsyncAction,
     onUntrackAsyncAction,
     onViewAuthor,
@@ -34,14 +32,12 @@ export default ({
                 <MaybeDataRows
                     page={page}
                     selected={selected}
-                    actionIds={actionIds}
-                    transients={transients}
                     onToggleCheck={onToggleCheck}
                     onTrackAsyncAction={onTrackAsyncAction}
                     onUntrackAsyncAction={onUntrackAsyncAction}
                     onViewAuthor={onViewAuthor}
                 />
-                <MaybeBuffer page={page} transients={transients} />
+                <MaybeBuffer page={page} />
             </tbody>
         </table>
         <div><button onClick={onBatchStar}>Star selected</button><br /><br /></div>

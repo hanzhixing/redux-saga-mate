@@ -1,5 +1,5 @@
 import {createSelector} from 'reselect';
-import {get, prop} from 'lodash/fp';
+import {get} from 'lodash/fp';
 import {createSelectActions} from 'redux-saga-mate/src/selector';
 
 export const selectPostIds = (state, props) => get(['ui', 'posts', props.page, 'ids'], state);
@@ -58,22 +58,22 @@ export const selectModalAuthor = createSelector(
 );
 
 export const selectTransientOfOnPage = createSelector(
-    (state, props) => props.transients,
+    selectActions,
     (state, props) => props.page,
-    (transients, page) => {
-        if (!transients.onPage || !transients.onPage[page]) {
+    (actions, page) => {
+        if (!actions.onPage || !actions.onPage[page]) {
             return undefined;
         }
-        return transients.onPage[page];
+        return actions.onPage[page];
     }
 );
 
 export const selectTransientOfOnStar = createSelector(
-    (state, props) => props.transients,
-    transients => {
-        if (!transients.onStar || !transients.onStar) {
+    selectActions,
+    actions => {
+        if (!actions.onStar || !actions.onStar) {
             return undefined;
         }
-        return transients.onStar;
+        return actions.onStar;
     }
 );

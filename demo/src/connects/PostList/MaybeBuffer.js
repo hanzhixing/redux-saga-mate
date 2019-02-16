@@ -1,10 +1,11 @@
 import {connect} from 'react-redux';
-import {compose, branch, renderComponent} from 'recompose';
+import {compose, branch, renderComponent, withProps} from 'recompose';
 import {createSelector} from 'reselect';
 import {createAction} from 'redux-actions';
 import LoadingBuffer from '../../components/PostList/LoadingBuffer';
 import Buffer from '../../components/PostList/Buffer';
 import Empty from '../../components/PostList/Empty';
+import {mapAsyncActionProps, withAsyncActionContextConsumer} from './actions';
 import {selectPosts, selectPostsBuffer, selectTransientOfOnPage} from './selectors';
 import * as ActionTypes from '../../actions/types';
 
@@ -53,4 +54,9 @@ const maybeNotBuffer = compose(
     maybeNothing,
 );
 
-export default compose(withRedux, maybeNotBuffer)(Buffer);
+export default compose(
+    withAsyncActionContextConsumer,
+    withProps(mapAsyncActionProps),
+    withRedux,
+    maybeNotBuffer
+)(Buffer);

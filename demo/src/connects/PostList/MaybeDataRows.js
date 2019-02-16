@@ -1,5 +1,5 @@
 import {connect} from 'react-redux';
-import {compose, branch, renderComponent} from 'recompose';
+import {compose, branch, renderComponent, withProps} from 'recompose';
 import {createSelector} from 'reselect';
 import {createAction} from 'redux-actions';
 import {createAsyncAction, idOfAction} from 'redux-saga-mate/src/action';
@@ -7,6 +7,7 @@ import Placeholder from '../../components/PostList/Placeholder';
 import Loading from '../../components/PostList/Loading';
 import NoData from '../../components/PostList/NoData';
 import DataRows from '../../components/PostList/DataRows';
+import {mapAsyncActionProps, withAsyncActionContextConsumer} from './actions';
 import {selectPosts, selectPostsBuffer, selectTransientOfOnPage, selectTransientOfOnStar} from './selectors';
 import * as ActionTypes from '../../actions/types';
 
@@ -65,4 +66,9 @@ const maybeNoData = branch(
 
 const maybeNotDataRows = compose(maybeNoData, maybePlaceholder, maybeLoading);
 
-export default compose(withRedux, maybeNotDataRows)(DataRows);
+export default compose(
+    withAsyncActionContextConsumer,
+    withProps(mapAsyncActionProps),
+    withRedux,
+    maybeNotDataRows,
+)(DataRows);

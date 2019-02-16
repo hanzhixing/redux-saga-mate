@@ -3,7 +3,7 @@ import {createAction} from 'redux-actions';
 import {isFSA} from 'flux-standard-action';
 import uuidv5 from 'uuid/v5';
 import {FluxStandardActionError} from './error';
-import {PHASE_GHOST, PHASE_WAITING, PHASE_RUNNING, PHASE_FINISH} from './phase';
+import {PHASE_GHOST, PHASE_STARTED, PHASE_RUNNING, PHASE_FINISH} from './phase';
 
 const UUID_NULL = '00000000-0000-0000-0000-000000000000';
 
@@ -63,7 +63,7 @@ export const trackFor = parent => child => {
     };
 };
 
-export const isWaiting = action => action.meta.phase === PHASE_WAITING;
+export const isStarted = action => action.meta.phase === PHASE_STARTED;
 export const isRunning = action => action.meta.phase === PHASE_RUNNING;
 export const isFinished = action => action.meta.phase === PHASE_FINISH;
 
@@ -137,7 +137,7 @@ export const makeChildOf = parent => child => {
         ...childAction,
         meta: {
             ...childAction.meta,
-            phase: PHASE_WAITING,
+            phase: PHASE_STARTED,
             progress: 0,
         },
     };
@@ -154,7 +154,7 @@ export const makeActionAsync = action => {
         ...trackableAction,
         meta: {
             ...trackableAction.meta,
-            phase: PHASE_WAITING,
+            phase: PHASE_STARTED,
             progress: 0,
         },
     };
