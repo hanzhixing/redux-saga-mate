@@ -174,9 +174,9 @@ export const restfulGetManyPosts = args => fetch(...).then(data => normalize(dat
 ```js
 import {combineReducers} from 'redux';
 import {concat, difference} from 'lodash/fp';
-import {createActionsReducer, createEntitiesReducer, groupByComposeByEntityType} from 'redux-saga-mate/src/reducer';
+import {createActionsReducer, createEntitiesReducer, groupByComposeByEntityType} from 'redux-saga-mate/lib/reducer';
 // there are only these two operations for state updating.
-import {UPDATE, DELETE} from 'redux-saga-mate/src/operation';
+import {UPDATE, DELETE} from 'redux-saga-mate/lib/operation';
 import * as ActionTypes from '../actions/types'; // It's ok, if you want to import action types explicitly.
 
 // The keys is your entities keys in the store.
@@ -222,11 +222,14 @@ export default combineReducers({
 ### sagas/index.js
 ```js
 import {all, takeEvery} from 'redux-saga/effects';
-import {makeCreateDefaultWorker} from 'redux-saga-mate/src/saga';
+import {makeCreateDefaultWorker} from 'redux-saga-mate/lib/saga';
 import * as ActionTypes from '../actions/types';
 import * as Api from '../api';
 
 // you need to tell the Error Type for failure situation of the async action.
+// The default workder will automatically clear the action state when success.
+// Because in most cases, after your reducer have already runed, the data you need are already in the state.
+// then you want to dismiss the loading state.
 const createDefaultWorker = makeCreateDefaultWorker(Error);
 
 // Notice!
@@ -251,18 +254,30 @@ export default function* () {
 ```
 
 ### connects/PostList/index.js (or containers/PostList/index.js)
+#### imports
 ```js
 import {connect} from 'react-redux';
-import {compose, lifecycle, withState} from 'recompose';
+import {compose, lifecycle, withState, mapProps} from 'recompose';
 import {createSelector} from 'reselect';
 import {createAction} from 'redux-actions';
-import {createAsyncAction, idOfAction} from 'redux-saga-mate/src/action';
-import {withAsyncActionStateHandler} from 'redux-saga-mate/src/hoc';
-import {createSelectActions} from 'redux-saga-mate/src/selector';
+import {createAsyncAction, idOfAction} from 'redux-saga-mate/lib/action';
+import {
+    // You can use this,
+    withAsyncActionStateHandler,
+    // or this.
+    createAsyncActionContext,
+    // How they are different from each other, go on reading to the end.
+} from 'redux-saga-mate/lib/hoc';
+import {createSelectActions} from 'redux-saga-mate/lib/selector';
 import PostList from '../../components/PostList';
 import {selectPosts, selectPostsBuffer, selectModalAuthor} from './selectors';
 import * as ActionTypes from '../../actions/types';
+```
 
+#### mapStateToProps
+
+```js
+// The selector below is the same as the selector you got from reselect's createSelector.
 const selectActions = createSelectActions(
     (state, props) => state.actions, // provide actions selector from store
     (state, props) => props.actionIds, // provide actionIds selector maybe from props
@@ -270,11 +285,13 @@ const selectActions = createSelectActions(
 
 const makeSelectProps = () => createSelector(
     selectPosts,
-    selectActions, // Once your component is wrapped with 'withAsyncActionStateHandler`, you can select out the actions
+    // Once your component is wrapped with 'withAsyncActionStateHandler', you can select out the actions.
+    // So as when you wrapped with 'withAsyncActionContextConsumer' created by 'createAsyncActionContext'.
+    selectActions,
     (items, transients) => ({
         items: posts,
         transients, // in the ui component, you can examine the action by 'transients.onPage[page]'
-        ....
+        ...
     }),
 );
 
@@ -282,7 +299,11 @@ const makeMapStateToProps = () => {
     const selectProps = makeSelectProps();
     return (state, props) => selectProps(state, props);
 };
+```
 
+#### mapDispatchToProps
+
+```js
 const mapDispatchToProps = (dispatch, props) => ({
     onPage: page => {
         // 1. Make your action Async with 'createAsyncAction'.
@@ -299,6 +320,20 @@ const mapDispatchToProps = (dispatch, props) => ({
 
 const withRedux = connect(makeMapStateToProps, mapDispatchToProps);
 
+export default compose(
+    ...
+    withRedux,
+    ...
+)(PostList);
+```
+
+#### enhance with aysnc action tracking
+You have two options.
+
+##### Option1
+Use `withAsyncActionStateHandler`
+
+```js
 const withAsyncAction = withAsyncActionStateHandler(({actionIds, setActionId, unsetActionId}) => ({
     actionIds,
     onTrackAsyncAction: setActionId,
@@ -308,6 +343,45 @@ const withAsyncAction = withAsyncActionStateHandler(({actionIds, setActionId, un
 export default compose(
     ...
     withAsyncAction,
+    ...
+    withRedux,
+    ...
+)(PostList);
+```
+
+##### Option2 Use `createAsyncActionContext`
+```js
+// You may want to create these two hoc from a seperated file and import the provider or consumer.
+// The benefit use context is you need not pass the props along the tree.
+const {withAsyncActionContextProvider, withAsyncActionContextConsumer} = createAsyncActionContext();
+
+export default compose(
+    ...
+    withAsyncActionContextProvider,
+    ...
+    withAsyncActionContextConsumer,
+    mapProps(({actionIds, setActionId, unsetActionId}) => ({ // It is just recompose's mapProps
+        actionIds, // off course the 'actionIds' must be matched with the key in the action selector: selectActions
+        onTrackAsyncAction: setActionId, // You can map the props like this.
+        onUntrackAsyncAction: unsetActionId,
+    }))
+    withRedux,
+    ...
+)(PostList);
+```
+
+#### Use different prop names
+```js
+const mapActionProps = ({actionIds, setActionId, unsetActionId}) => ({
+    actionIds, // off course the 'actionIds' must be matched with the key in the action selector: selectActions
+    onTrackAsyncAction: setActionId, // You can map the props like this.
+    onUntrackAsyncAction: unsetActionId,
+})
+
+export default compose(
+    ...
+    withAsyncActionContextConsumer,
+    mapProps(mapActionProps), // It is just recompose's mapProps, you can use withProps or mapProps.
     withRedux,
     ...
 )(PostList);
