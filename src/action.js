@@ -28,9 +28,9 @@ export const pidOfAction = action => {
         throw new FluxStandardActionError();
     }
 
-    const {meta = {}} = action;
+    const {meta} = action;
 
-    return meta.pid;
+    return meta ? meta.pid : undefined;
 };
 
 export const makeTrackable = action => {

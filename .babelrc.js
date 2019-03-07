@@ -1,6 +1,4 @@
 /* global process, module */
-const { NODE_ENV } = process.env;
-
 module.exports = {
     presets: [
         [
@@ -9,6 +7,7 @@ module.exports = {
                 "modules": false,
             }
         ],
+        '@babel/preset-react',
     ],
     plugins: [
         '@babel/plugin-transform-parameters',
@@ -19,6 +18,12 @@ module.exports = {
         '@babel/plugin-proposal-class-properties',
         '@babel/plugin-syntax-dynamic-import',
         '@babel/plugin-transform-async-to-generator',
-        // ['babel-plugin-transform-builtin-extend', {globals: ['Error', 'Array'], approximate: true}],
-    ]
+        ['babel-plugin-transform-builtin-extend', {globals: ['Error', 'Array'], approximate: true}],
+        'babel-plugin-react-require',
+    ],
+    env: {
+	    test: {
+		    plugins: ['transform-es2015-modules-commonjs'],
+	    },
+    },
 }
