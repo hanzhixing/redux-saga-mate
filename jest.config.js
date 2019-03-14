@@ -1,5 +1,5 @@
 /* global module */
 module.exports = {
     verbose: true,
-    "setupFiles": ["<rootDir>/setupFile.js"],
+    setupFiles: ['<rootDir>/setupFile.js'],
 };

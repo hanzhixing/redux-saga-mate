@@ -1,4 +1,3 @@
-import React from 'react';
 import {repeat} from '../../utils';
 
 export default () => {

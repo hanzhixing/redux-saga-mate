@@ -1,4 +1,3 @@
-import React from 'react';
 import {get} from 'lodash/fp';
 import DataRow from './DataRow';
 
@@ -12,17 +11,15 @@ export default ({
     onViewAuthor,
     onToggleCheck,
     transients,
-}) => {
-    return items.map(item => (
-        <DataRow
-            key={item.id}
-            {...item}
-            isChecked={(selected || []).includes(item.id)}
-            onStar={onStar}
-            onStarTransient={get(item.id, onStarTransient)}
-            onViewAuthor={onViewAuthor}
-            onToggleCheck={onToggleCheck}
-            onClearStarLoading={onClearStarLoading}
-        />
-    ));
-};
+}) =>items.map(item => (
+    <DataRow
+        key={item.id}
+        {...item}
+        isChecked={(selected || []).includes(item.id)}
+        onStar={onStar}
+        onStarTransient={get(item.id, onStarTransient)}
+        onViewAuthor={onViewAuthor}
+        onToggleCheck={onToggleCheck}
+        onClearStarLoading={onClearStarLoading}
+    />
+));

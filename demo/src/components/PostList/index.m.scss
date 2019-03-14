@@ -1,23 +1,9 @@
-.operation {
-    .error {
-        color: #ff0000;
+button {
+    &.no-border {
+        outline: none;
+        border: none;
     }
-
-    :global(.oi) {
-        cursor: pointer;
-        &:hover {
-            color: green;
-        }
-        &.star {
-            color: green;
-        }
-    }
-}
-
-.pagination {
-    display: flex;
-
-    span {
+    &.pager {
         width: 30px;
         height: 30px;
         line-height: 30px;
@@ -41,8 +27,22 @@
         }
     }
 }
+.operation {
+    .error {
+        color: #ff0000;
+    }
 
-.accept {
-    cursor: pointer;
-    color: #ff0000;
+    :global(.oi) {
+        cursor: pointer;
+        &:hover {
+            color: green;
+        }
+        &.star {
+            color: green;
+        }
+    }
+}
+
+.pagination {
+    display: flex;
 }

@@ -1,8 +1,8 @@
 # EditorConfig is awesome: http://EditorConfig.org
- 
+
 # top-most EditorConfig file
 root = true
- 
+
 # General settings for whole project
 [*]
 charset = utf-8
@@ -11,6 +11,7 @@ indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
 insert_final_newline = true
- 
-[package.json]
+
+# Matches the exact files either package.json or .travis.yml
+[{package.json,.travis.yml}]
 indent_size = 2

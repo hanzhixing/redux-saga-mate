@@ -1,8 +1,8 @@
-import React from 'react';
 import Pager from './Pager';
 import AuthorModal from './AuthorModal';
 import MaybeDataRows from '../../connects/PostList/MaybeDataRows';
 import MaybeBuffer from '../../connects/PostList/MaybeBuffer';
+import cx from './index.m.scss';
 
 export default ({
     modalPostAuthor,
@@ -40,7 +40,17 @@ export default ({
                 <MaybeBuffer page={page} />
             </tbody>
         </table>
-        <div><button onClick={onBatchStar}>Star selected</button><br /><br /></div>
+        <div>
+            <button
+                type="button"
+                onClick={onBatchStar}
+                className={cx('btn btn-primary btn-sm')}
+            >
+                Star selected
+            </button>
+            <br />
+            <br />
+        </div>
         <Pager onPage={onPage} page={page} />
         {!!modalPostAuthor && (<AuthorModal {...modalAuthorInfo} onCloseAuthorModal={onCloseAuthorModal} />)}
     </div>

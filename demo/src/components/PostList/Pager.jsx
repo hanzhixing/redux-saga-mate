@@ -1,7 +1,4 @@
-import React from 'react';
-import classNames from 'classnames/bind';
-import styles from './index.module.scss';
-const cx =classNames.bind(styles);
+import cx from './index.m.scss';
 
 const PageNumber = ({page, onClick, selected}) => {
     const handleClick = () => {
@@ -9,7 +6,13 @@ const PageNumber = ({page, onClick, selected}) => {
     };
 
     return (
-        <span onClick={handleClick} className={cx({selected})}>{page}</span>
+        <button
+            type="button"
+            onClick={handleClick}
+            className={cx({selected}, 'pager')}
+        >
+            {page}
+        </button>
     );
 };
 

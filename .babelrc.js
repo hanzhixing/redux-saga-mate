@@ -20,6 +20,7 @@ module.exports = {
         '@babel/plugin-transform-async-to-generator',
         ['babel-plugin-transform-builtin-extend', {globals: ['Error', 'Array'], approximate: true}],
         'babel-plugin-react-require',
+        'react-hot-loader/babel',
     ],
     env: {
 	    test: {

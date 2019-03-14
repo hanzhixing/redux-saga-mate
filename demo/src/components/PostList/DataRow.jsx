@@ -1,7 +1,4 @@
-import React from 'react';
-import classNames from 'classnames/bind';
-import styles from './index.module.scss';
-const cx =classNames.bind(styles);
+import cx from './index.m.scss';
 
 export default ({
     id,
@@ -42,9 +39,15 @@ export default ({
             </th>
             <td>{title}</td>
             <td className={cx('operation')}>
-                {author}{' '}
-                <span className="oi oi-eye" onClick={handleViewAuthor}></span>
-                {' '}({commenters.length})
+                {author}
+                {' '}
+                <button
+                    type="button"
+                    onClick={handleViewAuthor}
+                    className={cx('oi oi-eye', 'no-border')}
+                />
+                {' '}
+                {commenters.length}
             </td>
             <td>{email}</td>
             <td className={cx('operation')}>
@@ -58,13 +61,23 @@ export default ({
                 }
                 {
                     (!onStarTransient || !onStarTransient.isLoading) && (
-                        <span className={cx('oi', 'oi-star', {star})} onClick={handleStar}></span>
+                        <button
+                            type="button"
+                            onClick={handleStar}
+                            className={cx('oi oi-star', 'no-border', {star})}
+                        />
                     )
                 }
                 {' '}
                 {
                     (onStarTransient && !onStarTransient.isLoading && onStarTransient.error) && (
-                        <span className={cx('error')} onClick={handleConfirmError}>Failed!</span>
+                        <button
+                            type="button"
+                            className={cx('error', 'no-border')}
+                            onClick={handleConfirmError}
+                        >
+                            Failed! Click to Dimiss!
+                        </button>
                     )
                 }
             </td>
