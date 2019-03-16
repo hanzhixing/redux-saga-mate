@@ -1,5 +1,7 @@
-/* global module */
 module.exports = {
     verbose: true,
-    setupFiles: ['<rootDir>/setupFile.js'],
+    setupFiles: [
+        '<rootDir>/node_modules/regenerator-runtime/runtime',
+        '<rootDir>/setupFile.js',
+    ],
 };

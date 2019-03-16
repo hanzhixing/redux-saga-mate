@@ -23,5 +23,7 @@ module.exports = {
         "react/prop-types": ["off"],
         "react/jsx-indent-props": ["error", 4],
         "react/jsx-boolean-value": ["off"],
-    }
+    },
+    "globals": {
+    },
 };

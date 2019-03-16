@@ -23,6 +23,8 @@ const ensureSlash = (path, need) => {
 };
 
 module.exports = (cliEnv = {}, argv) => {
+    console.log(cliEnv, argv);
+
     const {mode} = argv;
 
     process.env.BABEL_ENV = mode;
@@ -35,13 +37,8 @@ module.exports = (cliEnv = {}, argv) => {
 
     const publicPath = isProd ? ensureSlash(servedUrl, true) : isDev && '/';
 
-    // Some apps do not use client-side routing with pushState.
-    // For these, "homepage" can be set to "." to enable relative asset paths.
     const shouldUseRelativeAssetPaths = publicPath === './';
 
-    // `publicUrl` is just like `publicPath`, but we will provide it to our app
-    // as %PUBLIC_URL% in `index.html` and `process.env.PUBLIC_URL` in JavaScript.
-    // Omit trailing slash as %PUBLIC_URL%/xyz looks better than %PUBLIC_URL%xyz.
     const publicUrl = isProd ? publicPath.slice(0, -1) : isDev && '';
 
     const env = {
@@ -194,20 +191,6 @@ module.exports = (cliEnv = {}, argv) => {
                 },
                 {
                     oneOf: [
-                        {
-                            test: /\.html$/,
-                            use: [
-                                {
-                                    loader: 'html-loader',
-                                    options: {
-                                        interpolate: true,
-                                        minimize: false,
-                                        removeComments: false,
-                                        collapseWhitespace: false
-                                    },
-                                },
-                            ],
-                        },
                         // {
                         //     test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
                         //     loader: 'url-loader',
@@ -277,6 +260,20 @@ module.exports = (cliEnv = {}, argv) => {
                                 name: 'static/media/[name].[hash:8].[ext]',
                             },
                         },
+                        {
+                            test: /\.html$/,
+                            use: [
+                                {
+                                    loader: 'html-loader',
+                                    options: {
+                                        interpolate: true,
+                                        minimize: false,
+                                        removeComments: false,
+                                        collapseWhitespace: false
+                                    },
+                                },
+                            ],
+                        },
                         // ** STOP ** Are you adding a new loader?
                         // Make sure to add the new loader(s) before the "file" loader.
                     ],
@@ -312,5 +309,4 @@ module.exports = (cliEnv = {}, argv) => {
             hints: 'warning',
         },
     };
-    console.log(argv.mode);
 };
