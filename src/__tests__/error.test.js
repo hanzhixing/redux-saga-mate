@@ -1,5 +1,4 @@
-/* global jest, describe, it, expect */
-import {FluxStandardActionError} from './error';
+import {FluxStandardActionError} from '../error';
 
 describe('FluxStandardActionError', () => {
     it('should throw error if the action is not FSA', () => {

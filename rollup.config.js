@@ -15,9 +15,11 @@ const productionConfig = {
     },
     plugins: [
         ignore(['prop-types']),
-        commonjs({ exclude: 'src/**' }),
-        nodeResolve(),
         babel(),
+        commonjs({ exclude: 'src/**' }),
+        nodeResolve({
+            extensions: ['.mjs', '.js', '.jsx', '.json'],
+        }),
         replace({
             'process.env.NODE_ENV': JSON.stringify('production'),
         }),

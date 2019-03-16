@@ -1,4 +1,5 @@
-/* global jest, describe, it, expect */
+import {PHASE_GHOST, PHASE_STARTED, PHASE_RUNNING, PHASE_FINISH} from '../phase';
+import {FluxStandardActionError} from '../error';
 import {
     idOfAction,
     pidOfAction,
@@ -14,9 +15,7 @@ import {
     makeChildOf,
     makeActionAsync,
     createAsyncAction,
-} from './action';
-import {PHASE_GHOST, PHASE_STARTED, PHASE_RUNNING, PHASE_FINISH} from './phase';
-import {FluxStandardActionError} from './error';
+} from '../action';
 
 const REGEX_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const REGEX_ISO8601 = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;

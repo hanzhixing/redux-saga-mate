@@ -21,6 +21,6 @@ export const makeCreateDefaultWorker = ([ErrorType, CleanupActionType]) => (meth
             yield put(failWith(error)(action));
             return;
         }
-        throw error instanceof Error ? error : new Error(JSON.stringify(error));
+        throw error;
     }
 };

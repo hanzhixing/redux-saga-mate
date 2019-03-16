@@ -1,4 +1,4 @@
-import React from 'react';
+import {createContext} from 'react';
 import {compose, withProps, withStateHandlers, renderComponent, wrapDisplayName} from 'recompose';
 import identity from 'ramda/src/identity';
 import set from 'ramda/src/set';
@@ -24,17 +24,13 @@ export const withAsyncActionStateHandler = (mapToProps = identity) => compose(
 );
 
 export const createAsyncActionContext = () => {
-    const {Provider, Consumer} = React.createContext(undefined);
+    const {Provider, Consumer} = createContext(undefined);
 
     const withAsyncActionContextProvider = ComponentIn => {
         const ComponentOut = ({actionIds, setActionId, unsetActionId, ...rest}) => (
-            React.createElement(
-                Provider,
-                {
-                    value: {actionIds, setActionId, unsetActionId}
-                },
-                React.createElement(ComponentIn, rest),
-            )
+            <Provider value={{actionIds, setActionId, unsetActionId}}>
+                <ComponentIn {...rest} />
+            </Provider>
         );
 
         ComponentOut.displayName = wrapDisplayName(ComponentIn, 'withAsyncActionContextProvider');
@@ -44,11 +40,13 @@ export const createAsyncActionContext = () => {
 
     const withAsyncActionContextConsumer = ComponentIn => {
         const ComponentOut = props => (
-            React.createElement(
-                Consumer,
-                null,
-                context => React.createElement(ComponentIn, {...props, ...context}),
-            )
+            <Consumer>
+                {
+                    context => (
+                        <ComponentIn {...props} {...context} />
+                    )
+                }
+            </Consumer>
         );
 
         ComponentOut.displayName = wrapDisplayName(ComponentIn, 'withAsyncActionContextConsumer');

@@ -1,7 +1,5 @@
-/* global jest, describe, it, expect */
 import {shallow, mount, render} from 'enzyme';
-import sinon from 'sinon';
-import {withAsyncActionStateHandler, createAsyncActionContext} from './hoc';
+import {withAsyncActionStateHandler, createAsyncActionContext} from '../hoc';
 
 describe('withAsyncActionStateHandler', () => {
     const Base = props => null;
@@ -39,7 +37,7 @@ describe('createAsyncActionContext', () => {
     }
     const Child = () => {
         console.log(222);
-        return <div></div>;
+        return <div />;
     }
 
     const EnhancedParent = withAsyncActionContextProvider(Parent);
