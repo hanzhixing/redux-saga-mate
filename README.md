@@ -2,6 +2,12 @@
 
 Allow you building react and redux based web apps with less pain, by removing the needs for writing lots of action types, reducers.
 
+![npm version](https://img.shields.io/npm/v/redux-saga-mate.svg)
+[![Build Status](https://travis-ci.org/hanzhixing/redux-saga-mate.svg?branch=master)](https://travis-ci.org/hanzhixing/redux-saga-mate)
+[![Coverage Status](https://coveralls.io/repos/github/hanzhixing/redux-saga-mate/badge.svg?branch=master)](https://coveralls.io/github/hanzhixing/redux-saga-mate?branch=master)
+![npm download](https://img.shields.io/npm/dt/redux-saga-mate.svg)
+![npm bundle size](https://img.shields.io/bundlephobia/minzip/redux-saga-mate.svg)
+
 ## You should know before go on reading
 ### Layers or Moments
 ```bash
