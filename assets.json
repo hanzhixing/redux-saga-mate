@@ -1,15 +1,15 @@
 {
-  "main.css": "/redux-saga-mate/static/css/main.ad9c1295.chunk.css",
-  "main.js": "/redux-saga-mate/static/js/main.d6c9dd15.chunk.js",
-  "main.js.map": "/redux-saga-mate/static/js/main.d6c9dd15.chunk.js.map",
-  "static/css/1.1756344b.chunk.css": "/redux-saga-mate/static/css/1.1756344b.chunk.css",
-  "static/js/1.272e94c9.chunk.js": "/redux-saga-mate/static/js/1.272e94c9.chunk.js",
-  "static/js/1.272e94c9.chunk.js.map": "/redux-saga-mate/static/js/1.272e94c9.chunk.js.map",
-  "runtime~main.js": "/redux-saga-mate/static/js/runtime~main.e5b620bb.js",
-  "runtime~main.js.map": "/redux-saga-mate/static/js/runtime~main.e5b620bb.js.map",
-  "static/media/favicon.ico": "/redux-saga-mate/static/media/favicon.d41d8cd9.ico",
-  "static/media/open-iconic-bootstrap.css": "/redux-saga-mate/static/media/open-iconic.3cf97837.woff",
-  "static/css/main.ad9c1295.chunk.css.map": "/redux-saga-mate/static/css/main.ad9c1295.chunk.css.map",
-  "static/css/1.1756344b.chunk.css.map": "/redux-saga-mate/static/css/1.1756344b.chunk.css.map",
-  "index.html": "/redux-saga-mate/index.html"
+  "main.css": "/static/css/main.11b003fe.chunk.css",
+  "main.js": "/static/js/main.8aafdca2.chunk.js",
+  "main.js.map": "/static/js/main.8aafdca2.chunk.js.map",
+  "runtime~main.js": "/static/js/runtime~main.42ac5946.js",
+  "runtime~main.js.map": "/static/js/runtime~main.42ac5946.js.map",
+  "static/css/2.533d28bc.chunk.css": "/static/css/2.533d28bc.chunk.css",
+  "static/js/2.2ac48a5f.chunk.js": "/static/js/2.2ac48a5f.chunk.js",
+  "static/js/2.2ac48a5f.chunk.js.map": "/static/js/2.2ac48a5f.chunk.js.map",
+  "index.html": "/index.html",
+  "static/css/2.533d28bc.chunk.css.map": "/static/css/2.533d28bc.chunk.css.map",
+  "static/css/main.11b003fe.chunk.css.map": "/static/css/main.11b003fe.chunk.css.map",
+  "static/media/favicon.ico": "/static/media/favicon.d41d8cd9.ico",
+  "static/media/open-iconic-bootstrap.css": "/static/media/open-iconic.eca2c267.svg"
 }
