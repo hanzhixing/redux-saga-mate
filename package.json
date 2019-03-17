@@ -1,6 +1,6 @@
 {
   "name": "redux-saga-mate",
-  "version": "0.6.0",
+  "version": "0.6.2",
   "description": "Allow you building react and redux based web apps with less pain.",
   "keywords": [
     "react",
@@ -37,8 +37,8 @@
     "build:esm": "babel src/ --out-dir dist/esm/ --ignore **/__tests__,**/__mocks__",
     "build:umd": "rollup -c",
     "analyze": "source-map-explorer dist/demo/static/js/main.*",
-    "predeploy": "webpack --mode=production --env.publicUrl=/ && npx serve dist/demo",
-    "deploy:demo": "gh-pages -d dist/demo"
+    "predeploy:demo": "webpack --mode=production --env.publicUrl=/ && npx serve dist/demo",
+    "deploy": "gh-pages -d dist/demo"
   },
   "browserslist": [
     ">0.2%",

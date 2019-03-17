@@ -5,6 +5,8 @@ import {makeCreateDefaultWorker} from '../saga';
 
 const REGEX_ISO8601 = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 
+// Notice! See below to know how to mock Date.
+// @see https://github.com/facebook/jest/issues/2234
 describe('makeCreateDefaultWorker', () => {
     const data = 'data';
 
@@ -43,7 +45,15 @@ describe('makeCreateDefaultWorker', () => {
         expect(() => run.throw(new Error()).value).toThrowError(Error);
     });
 
-    it('should let the worker dispatch a failed action if the error matches specified error type, then return.', () => {
+    it([
+        'should let the worker dispatch a failed action',
+        'if the error matches the specified error type,',
+        'then return.'
+    ].join(''), () => {
+        const theDate = Date;
+        const now = new Date();
+        global.Date = jest.fn(() => now);
+
         const worker = createWorker(asyncReject);
 
         const run = worker(action);
@@ -53,9 +63,18 @@ describe('makeCreateDefaultWorker', () => {
         expect(run.throw(error).value).toEqual(put(failWith(error)(action)));
         expect(run.next().done).toBe(true);
         expect(run.next().value).toBe(undefined);
+
+        global.Date = theDate;
     });
 
-    it('should let the worker dispatch a finished action, then dispatch cleaup action', () => {
+    it([
+        'should let the worker dispatch a finished action,',
+        'then dispatch cleaup action'
+    ].join(''), () => {
+        const theDate = Date;
+        const now = new Date();
+        global.Date = jest.fn(() => now);
+
         const worker = createWorker(asyncResolve);
 
         const run = worker(action);
@@ -64,9 +83,19 @@ describe('makeCreateDefaultWorker', () => {
         expect(run.next().value).toEqual(call(asyncResolve, action.payload));
         expect(run.next(data).value).toEqual(put(succeedWith(data)(action)));
         expect(run.next().value).toEqual(put(createAction(clearType)(idOfAction(action))));
+
+        global.Date = theDate;
     });
 
-    it('should let the worker dispatch a finished action with calculated payload if provide a function, then dispatch cleaup action', () => {
+    it([
+        'should let the worker dispatch a finished action',
+        'with calculated payload if provide a function,',
+        'then dispatch cleaup action'
+    ].join(''), () => {
+        const theDate = Date;
+        const now = new Date();
+        global.Date = jest.fn(() => now);
+
         const payload = 'any';
         const worker = createWorker(asyncResolve, (state, action) => payload);
 
@@ -76,5 +105,7 @@ describe('makeCreateDefaultWorker', () => {
         expect(run.next(payload).value).toEqual(call(asyncResolve, payload));
         expect(run.next(data).value).toEqual(put(succeedWith(data)(action)));
         expect(run.next().value).toEqual(put(createAction(clearType)(idOfAction(action))));
+
+        global.Date = theDate;
     });
 });

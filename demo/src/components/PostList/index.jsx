@@ -2,6 +2,7 @@ import Pager from './Pager';
 import AuthorModal from './AuthorModal';
 import MaybeDataRows from '../../connects/PostList/MaybeDataRows';
 import MaybeBuffer from '../../connects/PostList/MaybeBuffer';
+import {e2e} from '../../utils';
 import cx from './index.m.scss';
 
 export default ({
@@ -44,7 +45,7 @@ export default ({
             <button
                 type="button"
                 onClick={onBatchStar}
-                className={cx('btn btn-primary btn-sm')}
+                className={cx('btn btn-primary btn-sm', e2e('batch-star'))}
             >
                 Star selected
             </button>

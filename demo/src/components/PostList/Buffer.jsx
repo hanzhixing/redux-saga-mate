@@ -1,3 +1,4 @@
+import {e2e} from '../../utils';
 import cx from './index.m.scss';
 
 export default ({buffer, onAccept}) => (
@@ -8,7 +9,7 @@ export default ({buffer, onAccept}) => (
             <button
                 type="button"
                 onClick={onAccept}
-                className={cx('btn btn-outline-primary btn-sm')}
+                className={cx('btn btn-outline-primary btn-sm', e2e('accept-new-buffer'))}
             >
                 accpet!
             </button>

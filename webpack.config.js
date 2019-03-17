@@ -7,7 +7,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const safePostCssParser = require('postcss-safe-parser');
 const ManifestPlugin = require('webpack-manifest-plugin');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
 
 const homepage = require(path.resolve(__dirname, 'package.json')).homepage;
 
@@ -69,15 +69,6 @@ module.exports = (cliEnv = {}, argv) => {
             loader: 'postcss-loader',
             options: {
                 ident: 'postcss',
-                plugins: () => [
-                    require('postcss-flexbugs-fixes'),
-                    require('postcss-preset-env')({
-                        autoprefixer: {
-                            flexbox: 'no-2009',
-                        },
-                        stage: 3,
-                    }),
-                ],
                 sourceMap: isProd && true,
             },
         },
@@ -93,7 +84,7 @@ module.exports = (cliEnv = {}, argv) => {
         mode: isProd ? 'production' : isDev && 'development',
         // Stop compilation early in production
         bail: isProd,
-        devtool: isProd ? true ? 'source-map' : false : isDev && 'cheap-module-source-map',
+        devtool: isProd ? 'source-map' : (isDev ? 'cheap-module-source-map' : false),
         devServer: {
             // quiet: true,
             // stats: 'errors-only',
@@ -103,7 +94,8 @@ module.exports = (cliEnv = {}, argv) => {
             contentBase: path.join(__dirname, 'public'),
             watchContentBase: true,
             hot: true,
-            historyApiFallback: true
+            historyApiFallback: true,
+            stats: 'minimal',
         },
         entry: [
             // isDev && 'webpack-dev-server/client?',
@@ -293,7 +285,7 @@ module.exports = (cliEnv = {}, argv) => {
             }),
             new ManifestPlugin({
                 fileName: 'assets.json',
-                publicPath: publicPath,
+                publicPath,
             }),
             new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
             isProd && new BundleAnalyzerPlugin({analyzerMode: 'static', openAnalyzer: false}),
@@ -306,7 +298,7 @@ module.exports = (cliEnv = {}, argv) => {
             child_process: 'empty',
         },
         performance: {
-            hints: 'warning',
+            hints: isProd ? 'warning' : false,
         },
     };
 };

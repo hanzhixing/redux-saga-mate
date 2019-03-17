@@ -1,3 +1,4 @@
+import {e2e} from '../../utils';
 import cx from './index.m.scss';
 
 const PageNumber = ({page, onClick, selected}) => {
@@ -9,7 +10,7 @@ const PageNumber = ({page, onClick, selected}) => {
         <button
             type="button"
             onClick={handleClick}
-            className={cx({selected}, 'pager')}
+            className={cx({selected}, 'pager', e2e(`page-${page}`))}
         >
             {page}
         </button>

@@ -1,3 +1,4 @@
+import {e2e} from '../../utils';
 import cx from './index.m.scss';
 
 export default ({
@@ -44,7 +45,7 @@ export default ({
                 <button
                     type="button"
                     onClick={handleViewAuthor}
-                    className={cx('oi oi-eye', 'no-border')}
+                    className={cx('oi oi-eye', 'no-border', e2e('view-author'))}
                 />
                 {' '}
                 {commenters.length}
@@ -64,7 +65,7 @@ export default ({
                         <button
                             type="button"
                             onClick={handleStar}
-                            className={cx('oi oi-star', 'no-border', {star})}
+                            className={cx('oi oi-star', 'no-border', {star}, e2e('star-post'))}
                         />
                     )
                 }
@@ -73,7 +74,7 @@ export default ({
                     (onStarTransient && !onStarTransient.isLoading && onStarTransient.error) && (
                         <button
                             type="button"
-                            className={cx('error', 'no-border')}
+                            className={cx('error', 'no-border', e2e('confirm-star-error'))}
                             onClick={handleConfirmError}
                         >
                             Failed! Click to Dimiss!

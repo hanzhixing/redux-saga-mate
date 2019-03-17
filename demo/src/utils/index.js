@@ -19,3 +19,5 @@ export const offsetToPage = (offset, limit = 10) => offset / limit + 1;
 
 export const pageToOffset = (page, limit = 10) =>
     page > 1 ? (page - 1) * limit : 0;
+
+export const e2e = str => `test-id-${str}`;

@@ -1,4 +1,5 @@
 import ReactModal from 'react-modal';
+import {e2e} from '../../utils';
 import cx from './index.m.scss';
 
 ReactModal.setAppElement(document.body);
@@ -30,7 +31,7 @@ export default ({isLoading, fullName, onCloseAuthorModal}) => (
         <button
             type="button"
             onClick={onCloseAuthorModal}
-            className={cx('btn btn-primary btn-sm')}
+            className={cx('btn btn-primary btn-sm', e2e('global-author-modal'))}
         >
             Close
         </button>
