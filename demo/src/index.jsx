@@ -1,4 +1,4 @@
-import {render} from '@hot-loader/react-dom';
+import {render} from 'react-dom';
 import 'open-iconic/font/css/open-iconic-bootstrap.css'
 import 'bootstrap/dist/css/bootstrap.css';
 import App from './components/App';

@@ -86,8 +86,6 @@ module.exports = (cliEnv = {}, argv) => {
         bail: isProd,
         devtool: isProd ? 'source-map' : (isDev ? 'cheap-module-source-map' : false),
         devServer: {
-            // quiet: true,
-            // stats: 'errors-only',
             disableHostCheck: true,
             compress: true,
             clientLogLevel: 'none',
@@ -163,6 +161,8 @@ module.exports = (cliEnv = {}, argv) => {
         },
         resolve: {
             alias: {
+                // This is the patch which removes the warning below in the browser console.
+                // Warning! React-Hot-Loader: react-hot-dom patch is not detected. React 16.6+ features may not work.
                 'react-dom': '@hot-loader/react-dom',
                 'redux-saga-mate': path.resolve(__dirname),
             },
