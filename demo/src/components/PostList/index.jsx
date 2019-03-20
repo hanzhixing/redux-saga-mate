@@ -18,7 +18,7 @@ export default ({
     onUntrackAsyncAction,
     onViewAuthor,
 }) => (
-    <div className="mx-auto" style={{marginTop: '50px', width: '1200px'}}>
+    <div className="mx-auto">
         <table className="table table-md">
             <thead>
                 <tr>

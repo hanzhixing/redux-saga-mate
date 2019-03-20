@@ -1,4 +1,4 @@
-import {createAsyncActionContext} from 'redux-saga-mate/src/hoc';
+import {createAsyncActionContext} from 'redux-saga-mate';
 
 export const {
     withAsyncActionContextProvider,

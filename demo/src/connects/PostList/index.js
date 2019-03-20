@@ -1,11 +1,7 @@
 import {connect} from 'react-redux';
 import {compose, lifecycle, withState, withProps} from 'recompose';
 import {createSelector} from 'reselect';
-import {createAsyncAction, idOfAction} from 'redux-saga-mate/src/action';
-// import {
-//     withAsyncActionStateHandler,
-//     createAsyncActionContext,
-// } from 'redux-saga-mate/src/hoc';
+import {createAsyncAction, idOfAction} from 'redux-saga-mate';
 import {delay} from '../../utils';
 import PostList from '../../components/PostList';
 import {
@@ -67,10 +63,13 @@ const withRedux = connect(makeMapStateToProps, mapDispatchToProps);
 
 const withLifecycle = lifecycle({
     componentDidMount() {
-        delay(2).then(() => {
-            this.props.onPage(1);
-        });
-    }
+        this.controller = new AbortController();
+
+        delay(2, this.controller.signal).then(() => (this.props.onPage(1)));
+    },
+    componentWillUnmount() {
+        this.controller.abort();
+    },
 });
 
 const withLiftedStates = compose(

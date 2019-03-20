@@ -1,7 +1,12 @@
 import {combineReducers} from 'redux';
 import {concat, difference} from 'lodash/fp';
-import {createActionsReducer, createEntitiesReducer, groupByComposeByEntityType} from 'redux-saga-mate/src/reducer';
-import {UPDATE, DELETE} from 'redux-saga-mate/src/operation';
+import {
+    createActionsReducer,
+    createEntitiesReducer,
+    groupByComposeByEntityType,
+    UPDATE,
+    DELETE,
+} from 'redux-saga-mate';
 import * as ActionTypes from '../actions/types';
 import ui from './ui';
 

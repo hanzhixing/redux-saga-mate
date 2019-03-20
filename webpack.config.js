@@ -98,6 +98,7 @@ module.exports = (cliEnv = {}, argv) => {
         entry: [
             // isDev && 'webpack-dev-server/client?',
             // isDev && 'webpack/hot/only-dev-server',
+            'abortcontroller-polyfill/dist/polyfill-patch-fetch',
             '@babel/polyfill',
             path.resolve(__dirname, 'demo/src/index'),
         ].filter(Boolean),
@@ -163,8 +164,9 @@ module.exports = (cliEnv = {}, argv) => {
             alias: {
                 // This is the patch which removes the warning below in the browser console.
                 // Warning! React-Hot-Loader: react-hot-dom patch is not detected. React 16.6+ features may not work.
+
                 'react-dom': '@hot-loader/react-dom',
-                'redux-saga-mate': path.resolve(__dirname),
+                'redux-saga-mate': path.resolve(__dirname, 'src/index'),
             },
             extensions: ['.wasm', '.mjs', '.js', '.json', '.jsx'],
         },
@@ -278,7 +280,6 @@ module.exports = (cliEnv = {}, argv) => {
                 template: path.resolve(__dirname, 'demo/public/index.html'),
             }),
             new webpack.DefinePlugin(env.stringified),
-            isDev && new webpack.HotModuleReplacementPlugin(),
             isProd && new MiniCssExtractPlugin({
                 filename: 'static/css/[name].[contenthash:8].css',
                 chunkFilename: 'static/css/[name].[contenthash:8].chunk.css',

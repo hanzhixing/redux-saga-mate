@@ -1,11 +1,4 @@
-import {createAsyncAction, makeActionAsync, idOfAction, isFinished, continueWith, succeedWith, failWith} from './action';
-import {withAsyncActionStateHandler, createAsyncActionContext} from './hoc';
-import {UPDATE, DELETE} from './operation';
-import {createActionsReducer, createEntitiesReducer, groupByComposeByEntityType} from './reducer';
-import {makeCreateDefaultWorker} from './saga';
-import {createSelectActions} from './selector';
-
-export default {
+export {
     createAsyncAction,
     makeActionAsync,
     idOfAction,
@@ -13,15 +6,21 @@ export default {
     continueWith,
     succeedWith,
     failWith,
-    withAsyncActionStateHandler,
-    createAsyncActionContext,
-    Operations: {
-        UPDATE,
-        DELETE,
-    },
+} from './action';
+
+export {
     createActionsReducer,
     createEntitiesReducer,
     groupByComposeByEntityType,
-    makeCreateDefaultWorker,
-    createSelectActions,
-};
+} from './reducer';
+
+export {
+    withAsyncActionStateHandler,
+    createAsyncActionContext,
+} from './hoc';
+
+export {makeCreateDefaultWorker} from './saga';
+
+export {createSelectActions} from './selector';
+
+export {UPDATE, DELETE} from './operation';

@@ -1,6 +1,6 @@
 import {createSelector} from 'reselect';
 import {get} from 'lodash/fp';
-import {createSelectActions} from 'redux-saga-mate/src/selector';
+import {createSelectActions} from 'redux-saga-mate';
 
 export const selectPostIds = (state, props) => get(['ui', 'posts', props.page, 'ids'], state);
 export const selectBufferPostIds = (state, props) => get(['ui', 'posts', props.page, 'buffer'], state);

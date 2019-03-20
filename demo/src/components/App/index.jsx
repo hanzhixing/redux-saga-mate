@@ -1,11 +1,16 @@
 import {hot} from 'react-hot-loader/root';
-import {Provider} from 'react-redux';
-import store from '../../store';
-import PostList from '../../connects/PostList';
+import {Route} from 'react-router-dom';
+import loadable from '@loadable/component';
+import Menu from '../Menu';
+
+const PostList = loadable(() => import(
+    /* webpackChunkName: "PostList" */
+    '../../connects/PostList'
+), {fallback: null});
 
 const App = () => (
-    <Provider store={store}>
-        <header>
+    <>
+        <header className="col-12 text-center mt-3 mb-5">
             <a href="https://github.com/hanzhixing/redux-saga-mate.git">
                 <svg height="32" viewBox="0 0 16 16" version="1.1" width="32" aria-hidden="true">
                     <path
@@ -15,8 +20,17 @@ const App = () => (
                 </svg>
             </a>
         </header>
-        <div><PostList /></div>
-    </Provider>
+        <div className="container">
+            <div className="row flex-xl-nowrap">
+                <nav className="col-2 border-left">
+                    <Menu />
+                </nav>
+                <main className="col-10 border-left border-right">
+                    <Route exact path="/" component={PostList} />
+                </main>
+            </div>
+        </div>
+    </>
 );
 
 export default hot(App);

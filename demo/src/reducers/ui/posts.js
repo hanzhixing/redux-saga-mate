@@ -1,4 +1,4 @@
-import {isFinished} from 'redux-saga-mate/src/action';
+import {isFinished} from 'redux-saga-mate';
 import {compose, get, set} from 'lodash/fp';
 import * as ActionTypes from '../../actions/types';
 
