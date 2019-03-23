@@ -23,7 +23,9 @@ module.exports = {
         "react/prop-types": ["off"],
         "react/jsx-indent-props": ["error", 4],
         "react/jsx-boolean-value": ["off"],
+        "react/no-array-index-key": ["off"],
     },
     "globals": {
+        "ENV_PUBLIC_URL": "readonly",
     },
 };

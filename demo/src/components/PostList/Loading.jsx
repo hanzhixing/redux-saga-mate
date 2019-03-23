@@ -20,7 +20,7 @@ export default () => {
         return n + 1;
     };
 
-    repeat(10)(makeLoading)(1);
+    repeat(5)(makeLoading)(1);
 
     return rows;
 }

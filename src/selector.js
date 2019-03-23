@@ -11,10 +11,6 @@ export const createSelectActions = (selectActions, selectActionIds) => createSel
     (actions, actionIds) => {
         const reduceRecursively = function reduceRecursively(actionIds) {
             return keys(actionIds).reduce((acc, id) => {
-                if (!actionIds[id]) {
-                    return acc;
-                }
-
                 if (typeof actionIds[id] === 'string') {
                     if (!actions[actionIds[id]]) {
                         return acc;

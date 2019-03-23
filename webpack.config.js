@@ -95,22 +95,22 @@ module.exports = (cliEnv = {}, argv) => {
             historyApiFallback: true,
             stats: 'minimal',
         },
-        entry: [
-            // isDev && 'webpack-dev-server/client?',
-            // isDev && 'webpack/hot/only-dev-server',
-            'abortcontroller-polyfill/dist/polyfill-patch-fetch',
-            '@babel/polyfill',
-            path.resolve(__dirname, 'demo/src/index'),
-        ].filter(Boolean),
+        entry: {
+            index: [
+                'abortcontroller-polyfill/dist/polyfill-patch-fetch',
+                '@babel/polyfill',
+                path.resolve(__dirname, 'demo/src/index'),
+            ],
+            '404': [
+                '@babel/polyfill',
+                path.resolve(__dirname, 'demo/src/404'),
+            ]
+        },
         output: {
             path: isProd ? path.resolve(__dirname, 'dist/demo') : undefined,
             pathinfo: isDev,
-            filename: isProd
-                ? 'static/js/[name].[chunkhash:8].js'
-                : isDev && 'static/js/bundle.js',
-            chunkFilename: isProd
-                ? 'static/js/[name].[chunkhash:8].chunk.js'
-                : isDev && 'static/js/[name].chunk.js',
+            filename: `static/js/[name]${isProd ? '.[chunkhash]' : isDev && ''}.js`,
+            chunkFilename: `static/js/[name]${isProd ? '.[chunkhash]' : isDev && ''}.chunk.js`,
             publicPath: publicPath,
             devtoolModuleFilenameTemplate: isProd
                 ? info =>
@@ -186,13 +186,24 @@ module.exports = (cliEnv = {}, argv) => {
                 {
                     oneOf: [
                         // {
-                        //     test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
-                        //     loader: 'url-loader',
-                        //     options: {
-                        //         limit: 10000,
-                        //         name: 'static/media/[name].[hash:8].[ext]',
-                        //     },
+                        //     test: /\.svg$/,
+                        //     loader: 'svg-inline-loader'
                         // },
+                        {
+                            test: /\.svg$/,
+                            use: {
+                                loader: 'svg-react-loader',
+                            },
+                        },
+                        {
+                            test: /\.(bmp|gif|jpe?g|png)$/,
+                            // loader: 'url-loader',
+                            loader: 'file-loader',
+                            options: {
+                                limit: 10000,
+                                name: 'static/media/[name].[hash:8].[ext]',
+                            },
+                        },
                         {
                             test: /\.(js|mjs|jsx)$/,
                             include: [
@@ -278,6 +289,16 @@ module.exports = (cliEnv = {}, argv) => {
             new HtmlWebpackPlugin({
                 title: 'Redux Saga Mate Demo',
                 template: path.resolve(__dirname, 'demo/public/index.html'),
+                filename: 'index.html',
+                inject: 'body',
+                chunks: ['index'],
+            }),
+            new HtmlWebpackPlugin({
+                title: 'Redux Saga Mate Demo',
+                template: path.resolve(__dirname, 'demo/public/404.html'),
+                filename: '404.html',
+                inject: 'body',
+                chunks: ['404'],
             }),
             new webpack.DefinePlugin(env.stringified),
             isProd && new MiniCssExtractPlugin({

@@ -1,28 +1,27 @@
+import {NavLink} from 'react-router-dom';
 import {e2e} from '../../utils';
 import cx from './index.m.scss';
 
-const PageNumber = ({page, onClick, selected}) => {
-    const handleClick = () => {
-        onClick(page);
-    };
-
-    return (
-        <button
-            type="button"
-            onClick={handleClick}
-            className={cx({selected}, 'pager', e2e(`page-${page}`))}
+const PageNumber = ({page, active}) => (
+    <li className={cx('page-item', {active})} aria-current={active ? 'page' : undefined}>
+        <NavLink
+            to={`/post-list/${page}`}
+            className={cx('page-link', e2e(`page-${page}`))}
         >
             {page}
-        </button>
-    );
-};
+            {active && (<span className="sr-only">(current)</span>)}
+        </NavLink>
+    </li>
+);
 
-export default ({page, onPage}) => (
-    <div className={cx('pagination')}>
-        <PageNumber page={1} onClick={onPage} selected={page === 1} />
-        <PageNumber page={2} onClick={onPage} selected={page === 2} />
-        <PageNumber page={3} onClick={onPage} selected={page === 3} />
-        <PageNumber page={4} onClick={onPage} selected={page === 4} />
-        <PageNumber page={5} onClick={onPage} selected={page === 5} />
-    </div>
+export default ({page}) => (
+    <nav aria-label="Page navigation example">
+        <ul className="pagination justify-content-center">
+            {
+                [1, 2, 3, 4, 5].map(i => (
+                    <PageNumber key={i} page={i} active={i === page} />
+                ))
+            }
+        </ul>
+    </nav>
 );

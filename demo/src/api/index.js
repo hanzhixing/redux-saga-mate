@@ -8,6 +8,18 @@ import {MyError} from './errors';
 const post = new schema.Entity('posts');
 const user = new schema.Entity('users');
 
+export const noop = ({to}) => delay(3)
+    .then(() => {
+        if (to === 'success') {
+            return;
+        }
+        throw new MyError(JSON.stringify({
+            status: 400,
+            statusText: 'Bad Request',
+            body: '收藏失败',
+        }));
+    });
+
 export const getManyPost = ({page}) => delay(Math.ceil((Math.random() * 2)))
     .then(() => {
         const mockedPosts = [];
@@ -28,14 +40,14 @@ export const getManyPost = ({page}) => delay(Math.ceil((Math.random() * 2)))
 
             mockedPosts.push({
                 id: `${n}${Math.ceil((Math.random() * 2))}`,
-                title: `${Random.title()}${page}`,
+                title: `${Random.title().substring(0, 16)}-${page}`,
                 author: {
                     id: Math.ceil((Math.random() * 20)),
                     fullName: Random.name(),
                     utime: (new Date()).toISOString(),
                 },
                 commenters: uniq(mockedCommenters),
-                email: Random.email(),
+                email: Random.email().substring(0,10),
             });
             return n + 1;
         };

@@ -11,6 +11,7 @@ const createDefaultWorker = makeCreateDefaultWorker([MyError, ActionTypes.CLEANU
 // you need to implement your own worker sagas.
 export default function* () {
     yield all([
+        takeEvery(ActionTypes.ASYNC_NOOP, createDefaultWorker(Api.noop)),
         takeEvery(ActionTypes.ASYNC_GET_MANY_POST, createDefaultWorker(Api.getManyPost)),
         takeEvery(ActionTypes.ASYNC_PATCH_ONE_POST, createDefaultWorker(Api.patchOnePost)),
         takeEvery(ActionTypes.ASYNC_GET_ONE_USER_BY_POST_ID, createDefaultWorker(

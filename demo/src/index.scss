@@ -1,0 +1,20 @@
+@import "theme.scss";
+@import "~bootstrap/scss/bootstrap";
+
+.page-item {
+    :focus {
+        outline: none;
+        box-shadow: none;
+    }
+}
+.page-link {
+    :focus {
+        outline: none;
+        box-shadow: none;
+    }
+}
+
+.icon {
+    width: 16px;
+    height: 16px;
+}

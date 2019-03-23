@@ -3,6 +3,7 @@ import {compose, withProps, withStateHandlers, renderComponent, wrapDisplayName}
 import identity from 'ramda/src/identity';
 import set from 'ramda/src/set';
 import lensPath from 'ramda/src/lensPath';
+import dissocPath from 'ramda/src/dissocPath';
 
 const withStates = withStateHandlers(
     () => ({actionIds: {}}),
@@ -12,8 +13,8 @@ const withStates = withStateHandlers(
             return set(lens, actionId, state);
         },
         unsetActionId: (state, props) => key => {
-            const lens = Array.isArray(key) ? lensPath(['actionIds', ...key]) : lensPath(['actionIds', key]);
-            return set(lens, undefined, state);
+            const path = Array.isArray(key) ? ['actionIds', ...key] : ['actionIds', key];
+            return dissocPath(path, state);
         },
     }
 );

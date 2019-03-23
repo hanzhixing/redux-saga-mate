@@ -6,11 +6,10 @@ import {e2e} from '../../utils';
 import cx from './index.m.scss';
 
 export default ({
+    page,
     modalPostAuthor,
     modalAuthorInfo,
-    page,
     selected,
-    onPage,
     onToggleCheck,
     onCloseAuthorModal,
     onBatchStar,
@@ -19,8 +18,8 @@ export default ({
     onViewAuthor,
 }) => (
     <div className="mx-auto">
-        <table className="table table-md">
-            <thead>
+        <table className="table">
+            <thead className="thead-dark">
                 <tr>
                     <th scope="col">Id</th>
                     <th scope="col">Title</th>
@@ -52,7 +51,7 @@ export default ({
             <br />
             <br />
         </div>
-        <Pager onPage={onPage} page={page} />
+        <Pager page={page} />
         {!!modalPostAuthor && (<AuthorModal {...modalAuthorInfo} onCloseAuthorModal={onCloseAuthorModal} />)}
     </div>
 );
