@@ -1,13 +1,13 @@
 import Pager from './Pager';
 import AuthorModal from './AuthorModal';
-import MaybeDataRows from '../../connects/PostList/MaybeDataRows';
-import MaybeBuffer from '../../connects/PostList/MaybeBuffer';
+import MaybeDataRows from '../../connects/TodoList/MaybeDataRows';
+import MaybeBuffer from '../../connects/TodoList/MaybeBuffer';
 import {e2e} from '../../utils';
 import cx from './index.m.scss';
 
 export default ({
     page,
-    modalPostAuthor,
+    modalTodoAuthor,
     modalAuthorInfo,
     selected,
     onToggleCheck,
@@ -52,6 +52,6 @@ export default ({
             <br />
         </div>
         <Pager page={page} />
-        {!!modalPostAuthor && (<AuthorModal {...modalAuthorInfo} onCloseAuthorModal={onCloseAuthorModal} />)}
+        {!!modalTodoAuthor && (<AuthorModal {...modalAuthorInfo} onCloseAuthorModal={onCloseAuthorModal} />)}
     </div>
 );

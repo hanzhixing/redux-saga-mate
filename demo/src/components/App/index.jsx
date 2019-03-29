@@ -3,9 +3,9 @@ import {Switch, Route, Redirect, NavLink} from 'react-router-dom';
 import loadable from '@loadable/component';
 import GithubCat from './GithubCat.svg';
 
-const PostList = loadable(() => import(
-    /* webpackChunkName: "PostList" */
-    '../../connects/PostList'
+const TodoList = loadable(() => import(
+    /* webpackChunkName: "TodoList" */
+    '../../connects/TodoList'
 ), {fallback: null});
 
 const SimpleButtons = loadable(() => import(
@@ -19,8 +19,8 @@ const navs = [
         text: 'Simple Buttons',
     },
     {
-        to: `/post-list`,
-        text: 'Post List',
+        to: `/todo-list`,
+        text: 'Todo List',
     },
 ];
 
@@ -58,12 +58,12 @@ const App = () => (
                     <Route exact path="/" component={SimpleButtons} />
                     <Route path="/simple-buttons" component={SimpleButtons} />
                     <Switch>
-                        <Route exact path="/post-list">
-                            {() => (<Redirect to="/post-list/1" />)}
+                        <Route exact path="/todo-list">
+                            {() => (<Redirect to="/todo-list/1" />)}
                         </Route>
-                        <Route path="/post-list/:page">
+                        <Route path="/todo-list/:page">
                             {
-                                ({match: {params: {page}}}) => (<PostList page={page} />)
+                                ({match: {params: {page}}}) => (<TodoList page={page} />)
                             }
                         </Route>
                     </Switch>

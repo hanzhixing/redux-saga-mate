@@ -5,7 +5,7 @@ import cx from './index.m.scss';
 const PageNumber = ({page, active}) => (
     <li className={cx('page-item', {active})} aria-current={active ? 'page' : undefined}>
         <NavLink
-            to={`/post-list/${page}`}
+            to={`/todo-list/${page}`}
             className={cx('page-link', e2e(`page-${page}`))}
         >
             {page}

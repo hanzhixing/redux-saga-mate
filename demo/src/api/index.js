@@ -2,10 +2,10 @@ import {normalize, schema} from 'normalizr';
 import {Random} from 'mockjs';
 import {omit, uniq} from 'lodash/fp';
 import {delay, repeat} from '../utils';
-import {PAGE_SIZE_OF_POST_LIST} from '../config';
+import {PAGE_SIZE_OF_TODO_LIST} from '../config';
 import {MyError} from './errors';
 
-const post = new schema.Entity('posts');
+const todo = new schema.Entity('todos');
 const user = new schema.Entity('users');
 
 export const noop = ({to}) => delay(3)
@@ -20,11 +20,11 @@ export const noop = ({to}) => delay(3)
         }));
     });
 
-export const getManyPost = ({page}) => delay(Math.ceil((Math.random() * 2)))
+export const getManyTodo = ({page}) => delay(Math.ceil((Math.random() * 2)))
     .then(() => {
-        const mockedPosts = [];
+        const mockedTodos = [];
 
-        const createPosts = n => {
+        const createTodos = n => {
             const mockedCommenters = [];
 
             const createCommenters = n => {
@@ -38,7 +38,7 @@ export const getManyPost = ({page}) => delay(Math.ceil((Math.random() * 2)))
 
             repeat(5)(createCommenters)(1);
 
-            mockedPosts.push({
+            mockedTodos.push({
                 id: `${n}${Math.ceil((Math.random() * 2))}`,
                 title: `${Random.title().substring(0, 16)}-${page}`,
                 author: {
@@ -52,25 +52,25 @@ export const getManyPost = ({page}) => delay(Math.ceil((Math.random() * 2)))
             return n + 1;
         };
 
-        post.define({
+        todo.define({
             author: user,
             commenters: [user],
         });
 
-        repeat(PAGE_SIZE_OF_POST_LIST)(createPosts)(page * PAGE_SIZE_OF_POST_LIST);
+        repeat(PAGE_SIZE_OF_TODO_LIST)(createTodos)(page * PAGE_SIZE_OF_TODO_LIST);
 
         return {
             request: {
                 meta: {page},
             },
             response: {
-                ...normalize(mockedPosts, [post]),
+                ...normalize(mockedTodos, [todo]),
             }
         };
     });
 
 
-export const patchOnePost = ({...args}) => delay(Math.ceil((Math.random() * 4)))
+export const patchOneTodo = ({...args}) => delay(Math.ceil((Math.random() * 4)))
     .then(() => {
         const mock = {
             id: args.id,
@@ -92,7 +92,7 @@ export const patchOnePost = ({...args}) => delay(Math.ceil((Math.random() * 4)))
                 params: {id: args.id},
             },
             response: {
-                ...normalize(mock, post),
+                ...normalize(mock, todo),
             }
         };
     });

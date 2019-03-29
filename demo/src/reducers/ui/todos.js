@@ -4,7 +4,7 @@ import * as ActionTypes from '../../actions/types';
 
 export default (state = {}, action) => {
     switch (action.type) {
-        case ActionTypes.ASYNC_GET_MANY_POST: {
+        case ActionTypes.ASYNC_GET_MANY_TODO: {
             if (isFinished(action) && !action.error) {
                 const {payload: {request: {meta: {page}}, response: {result}}} = action;
                 const pathOfBuffer = [page, 'buffer'];
@@ -16,7 +16,7 @@ export default (state = {}, action) => {
             }
             return state;
         }
-        case ActionTypes.ACCEPT_UPDATE_POST_LIST: {
+        case ActionTypes.ACCEPT_UPDATE_TODO_LIST: {
             const {payload: {page}} = action;
             const pathOfBuffer = [page, 'buffer'];
             const pathOfIds = [page, 'ids'];

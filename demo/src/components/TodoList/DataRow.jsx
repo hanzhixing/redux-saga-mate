@@ -45,7 +45,7 @@ export default ({
                 <button
                     type="button"
                     onClick={handleViewAuthor}
-                    className={cx('oi oi-eye', 'no-border', e2e('view-author'))}
+                    className={cx('oi oi-eye', e2e('view-author'))}
                 />
                 {' '}
                 {commenters.length}
@@ -65,7 +65,7 @@ export default ({
                         <button
                             type="button"
                             onClick={handleStar}
-                            className={cx('oi oi-star', 'no-border', {star}, e2e('star-post'))}
+                            className={cx('oi oi-star', 'no-border', {star}, e2e('star-todo'))}
                         />
                     )
                 }

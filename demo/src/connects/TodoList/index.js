@@ -4,20 +4,20 @@ import {compose, lifecycle, withState, withProps} from 'recompose';
 import {createSelector} from 'reselect';
 import {createAsyncAction, idOfAction} from 'redux-saga-mate';
 import {delay} from '../../utils';
-import PostList from '../../components/PostList';
+import TodoList from '../../components/TodoList';
 import {withAsyncActionContextProvider, withAsyncActionContextConsumer, mapAsyncActionProps} from './actions';
-import {selectActions, selectPosts, selectPostsBuffer, selectModalAuthor} from './selectors';
+import {selectActions, selectTodos, selectTodosBuffer, selectModalAuthor} from './selectors';
 import * as ActionTypes from '../../actions/types';
 
 const makeMapStateToProps = () => createSelector(
-    selectPosts,
-    selectPostsBuffer,
+    selectTodos,
+    selectTodosBuffer,
     selectActions,
     selectModalAuthor,
     (state, props) => props.page,
-    (posts, buffer, transients, modalAuthorInfo, page) => ({
+    (todos, buffer, transients, modalAuthorInfo, page) => ({
         page: Number(page),
-        items: posts,
+        items: todos,
         buffer,
         transients,
         modalAuthorInfo,
@@ -28,17 +28,17 @@ const mapDispatchToProps = (dispatch, props) => {
     // console.log(props);
     return {
         onPage: page => {
-            const actionId = idOfAction(dispatch(createAsyncAction(ActionTypes.ASYNC_GET_MANY_POST)({
+            const actionId = idOfAction(dispatch(createAsyncAction(ActionTypes.ASYNC_GET_MANY_TODO)({
                 page,
             })));
             props.onTrackAsyncAction(['onPage', page], actionId);
         },
         onCloseAuthorModal: () => {
-            props.setModalPostAuthor(undefined);
+            props.setModalTodoAuthor(undefined);
         },
         onBatchStar: () => {
             props.selected.forEach(id => {
-                const actionId = idOfAction(dispatch(createAsyncAction(ActionTypes.ASYNC_PATCH_ONE_POST)({id})));
+                const actionId = idOfAction(dispatch(createAsyncAction(ActionTypes.ASYNC_PATCH_ONE_TODO)({id})));
                 props.onTrackAsyncAction(['onStar', id], actionId);
             });
         },
@@ -50,7 +50,7 @@ const mapDispatchToProps = (dispatch, props) => {
             }
         },
         onViewAuthor: id => {
-            props.setModalPostAuthor(id);
+            props.setModalTodoAuthor(id);
         },
     };
 };
@@ -81,7 +81,7 @@ const withLifecycle = lifecycle({
 
 const withLiftedStates = compose(
     withState('selected', 'setSelected', []),
-    withState('modalPostAuthor', 'setModalPostAuthor', undefined),
+    withState('modalTodoAuthor', 'setModalTodoAuthor', undefined),
 );
 
 export default withRouter(compose(
@@ -91,4 +91,4 @@ export default withRouter(compose(
     withProps(mapAsyncActionProps),
     withRedux,
     withLifecycle,
-)(PostList));
+)(TodoList));

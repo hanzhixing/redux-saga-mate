@@ -2,30 +2,30 @@ import {createSelector} from 'reselect';
 import {get} from 'lodash/fp';
 import {createSelectActions} from 'redux-saga-mate';
 
-export const selectPostIds = (state, props) => get(['ui', 'posts', props.page, 'ids'], state);
-export const selectBufferPostIds = (state, props) => get(['ui', 'posts', props.page, 'buffer'], state);
-export const selectModalPost = (state, props) => get([props.modalPostAuthor], state.entities.posts);
+export const selectTodoIds = (state, props) => get(['ui', 'todos', props.page, 'ids'], state);
+export const selectBufferTodoIds = (state, props) => get(['ui', 'todos', props.page, 'buffer'], state);
+export const selectModalTodo = (state, props) => get([props.modalTodoAuthor], state.entities.todos);
 
 export const selectUsers = (state, props) => state.entities.users;
 
-export const selectPosts = createSelector(
-    (state, props) => state.entities.posts,
-    selectPostIds,
+export const selectTodos = createSelector(
+    (state, props) => state.entities.todos,
+    selectTodoIds,
     selectUsers,
-    (posts, ids, users) => {
+    (todos, ids, users) => {
         if (ids) {
             return ids.map(id => ({
-                ...posts[String(id)],
-                author: users[posts[String(id)].author].fullName,
+                ...todos[String(id)],
+                author: users[todos[String(id)].author].fullName,
             }));
         }
         return undefined;
     },
 );
 
-export const selectPostsBuffer = createSelector(
-    selectBufferPostIds,
-    selectPostIds,
+export const selectTodosBuffer = createSelector(
+    selectBufferTodoIds,
+    selectTodoIds,
     (buffer, ids) => {
         if (!buffer || !ids) {
             return [];
@@ -40,10 +40,10 @@ export const selectActions = createSelectActions(
 );
 
 export const selectModalAuthor = createSelector(
-    selectModalPost,
+    selectModalTodo,
     selectUsers,
     selectActions,
-    (post, users, actions) => {
+    (todo, users, actions) => {
         const {isLoading} = actions.onViewAuthor ? actions.onViewAuthor : {isLoading: undefined};
 
         if (isLoading) {
@@ -52,7 +52,7 @@ export const selectModalAuthor = createSelector(
 
         return {
             isLoading,
-            ...post ? get([post.author], users) : {},
+            ...todo ? get([todo.author], users) : {},
         };
     },
 );

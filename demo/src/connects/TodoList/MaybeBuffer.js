@@ -2,16 +2,16 @@ import {connect} from 'react-redux';
 import {compose, branch, renderComponent, withProps} from 'recompose';
 import {createSelector} from 'reselect';
 import {createAction} from 'redux-actions';
-import LoadingBuffer from '../../components/PostList/LoadingBuffer';
-import Buffer from '../../components/PostList/Buffer';
-import Empty from '../../components/PostList/Empty';
+import LoadingBuffer from '../../components/TodoList/LoadingBuffer';
+import Buffer from '../../components/TodoList/Buffer';
+import Empty from '../../components/TodoList/Empty';
 import {mapAsyncActionProps, withAsyncActionContextConsumer} from './actions';
-import {selectPosts, selectPostsBuffer, selectTransientOfOnPage} from './selectors';
+import {selectTodos, selectTodosBuffer, selectTransientOfOnPage} from './selectors';
 import * as ActionTypes from '../../actions/types';
 
 const makeSelectProps = () => createSelector(
-    selectPosts,
-    selectPostsBuffer,
+    selectTodos,
+    selectTodosBuffer,
     selectTransientOfOnPage,
     (items, buffer, onPageTransient) => ({
         items,
@@ -27,7 +27,7 @@ const makeMapStateToProps = () => {
 
 const mapDispatchToProps = (dispatch, props) => ({
     onAccept: () => {
-        dispatch(createAction(ActionTypes.ACCEPT_UPDATE_POST_LIST)({page: props.page}));
+        dispatch(createAction(ActionTypes.ACCEPT_UPDATE_TODO_LIST)({page: props.page}));
     },
 });
 
