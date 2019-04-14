@@ -4,8 +4,11 @@ import {idOfAction, isFinished, failWith, succeedWith} from './action';
 
 // reducer和saga的执行顺序见下方issue
 // @see: https://github.com/redux-saga/redux-saga/issues/148
-export const makeCreateDefaultWorker = ([ErrorType, CleanupActionType], autoclear = true) => (
-    (method, payload) => {
+export const makeCreateDefaultWorker = (
+    [ErrorType, CleanupActionType],
+    {autoclear: autoclearByWorkerMaker} = {},
+) => (
+    (method, payload, {autoclear: autoClearByWorker} = {}) => {
         return function* defaultWorkerSaga(action) {
             try {
                 if (isFinished(action)) {
@@ -18,8 +21,16 @@ export const makeCreateDefaultWorker = ([ErrorType, CleanupActionType], autoclea
 
                 yield put(succeedWith(json)(action));
 
-                if (autoclear) {
+                if (autoClearByWorker === true) {
                     yield put(createAction(CleanupActionType)(idOfAction(action)));
+                    return;
+                }
+                if (autoClearByWorker === false) {
+                    return;
+                }
+                if (autoclearByWorkerMaker === true) {
+                    yield put(createAction(CleanupActionType)(idOfAction(action)));
+                    return;
                 }
             } catch (error) {
                 if (error instanceof ErrorType) {
