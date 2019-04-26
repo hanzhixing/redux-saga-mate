@@ -39,3 +39,19 @@ button.oi {
         color: var(--primary);
     }
 }
+
+button.text {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline;
+    margin: 0;
+    padding: 0;
+
+    &:hover,
+    &:focus {
+        outline: none;
+        text-decoration: none;
+    }
+}

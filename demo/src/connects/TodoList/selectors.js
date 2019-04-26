@@ -16,7 +16,7 @@ export const selectTodos = createSelector(
         if (ids) {
             return ids.map(id => ({
                 ...todos[String(id)],
-                author: users[todos[String(id)].author].fullName,
+                author: users[todos[String(id)].author].name,
             }));
         }
         return undefined;

@@ -12,8 +12,6 @@ describe('makeCreateDefaultWorker', () => {
 
     const clearType = 'clear';
 
-    const createWorker = makeCreateDefaultWorker([SyntaxError, clearType]);
-
     const type = 'test';
     const payload = 'hello';
 
@@ -27,6 +25,8 @@ describe('makeCreateDefaultWorker', () => {
     const asyncRejectUnknown = jest.fn(() => Promise.reject(errorUnknown));
 
     it('should let the worker return immediatly if the action is already finished', () => {
+        const createWorker = makeCreateDefaultWorker([SyntaxError, clearType]);
+
         const worker = createWorker(asyncResolve);
 
         const run = worker(succeedWith('anything')(action));
@@ -36,6 +36,8 @@ describe('makeCreateDefaultWorker', () => {
     });
 
     it('should let the worker throw on the error, if the error is unknown type.', () => {
+        const createWorker = makeCreateDefaultWorker([SyntaxError, clearType]);
+
         const worker = createWorker(asyncRejectUnknown);
 
         const run = worker(action);
@@ -50,6 +52,8 @@ describe('makeCreateDefaultWorker', () => {
         'if the error matches the specified error type,',
         'then return.'
     ].join(''), () => {
+        const createWorker = makeCreateDefaultWorker([SyntaxError, clearType]);
+
         const theDate = Date;
         const now = new Date();
         global.Date = jest.fn(() => now);
@@ -69,8 +73,11 @@ describe('makeCreateDefaultWorker', () => {
 
     it([
         'should let the worker dispatch a finished action,',
-        'then dispatch cleaup action'
+        'then dispatch cleaup action',
+        'if "autoclear" is defined "true" for the creator only',
     ].join(''), () => {
+        const createWorker = makeCreateDefaultWorker([SyntaxError, clearType], {autoclear: true});
+
         const theDate = Date;
         const now = new Date();
         global.Date = jest.fn(() => now);
@@ -83,6 +90,55 @@ describe('makeCreateDefaultWorker', () => {
         expect(run.next().value).toEqual(call(asyncResolve, action.payload));
         expect(run.next(data).value).toEqual(put(succeedWith(data)(action)));
         expect(run.next().value).toEqual(put(createAction(clearType)(idOfAction(action))));
+        expect(run.next().value).toEqual(undefined);
+
+        global.Date = theDate;
+    });
+
+    it([
+        'should let the worker dispatch a finished action,',
+        'then dispatch cleaup action',
+        'if "autoclear" is defined "true" for the worker only',
+    ].join(''), () => {
+        const createWorker = makeCreateDefaultWorker([SyntaxError, clearType]);
+
+        const theDate = Date;
+        const now = new Date();
+        global.Date = jest.fn(() => now);
+
+        const worker = createWorker(asyncResolve, undefined, {autoclear: true});
+
+        const run = worker(action);
+
+        expect(run.next().value).toEqual(select());
+        expect(run.next().value).toEqual(call(asyncResolve, action.payload));
+        expect(run.next(data).value).toEqual(put(succeedWith(data)(action)));
+        expect(run.next().value).toEqual(put(createAction(clearType)(idOfAction(action))));
+        expect(run.next().value).toEqual(undefined);
+
+        global.Date = theDate;
+    });
+
+    it([
+        'should let the worker dispatch a finished action,',
+        'without dispatching cleaup action',
+        'if "autoclear" is defined "false" for the worker, ',
+        'but "true" for the worker creator',
+    ].join(''), () => {
+        const createWorker = makeCreateDefaultWorker([SyntaxError, clearType], {autoclear: true});
+
+        const theDate = Date;
+        const now = new Date();
+        global.Date = jest.fn(() => now);
+
+        const worker = createWorker(asyncResolve, undefined, {autoclear: false});
+
+        const run = worker(action);
+
+        expect(run.next().value).toEqual(select());
+        expect(run.next().value).toEqual(call(asyncResolve, action.payload));
+        expect(run.next(data).value).toEqual(put(succeedWith(data)(action)));
+        expect(run.next().value).toEqual(undefined);
 
         global.Date = theDate;
     });
@@ -90,8 +146,9 @@ describe('makeCreateDefaultWorker', () => {
     it([
         'should let the worker dispatch a finished action',
         'with calculated payload if provide a function,',
-        'then dispatch cleaup action'
     ].join(''), () => {
+        const createWorker = makeCreateDefaultWorker([SyntaxError, clearType]);
+
         const theDate = Date;
         const now = new Date();
         global.Date = jest.fn(() => now);
@@ -104,7 +161,7 @@ describe('makeCreateDefaultWorker', () => {
         expect(run.next().value).toEqual(select());
         expect(run.next(payload).value).toEqual(call(asyncResolve, payload));
         expect(run.next(data).value).toEqual(put(succeedWith(data)(action)));
-        expect(run.next().value).toEqual(put(createAction(clearType)(idOfAction(action))));
+        expect(run.next().value).toEqual(undefined);
 
         global.Date = theDate;
     });

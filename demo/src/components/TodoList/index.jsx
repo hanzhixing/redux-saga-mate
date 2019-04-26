@@ -24,8 +24,7 @@ export default ({
                     <th scope="col">Id</th>
                     <th scope="col">Title</th>
                     <th scope="col">Author/Commenter Number</th>
-                    <th scope="col">E-mail</th>
-                    <th scope="col" style={{width: '200px'}}>Operation</th>
+                    <th scope="col" style={{width: '300px'}}>Operation</th>
                 </tr>
             </thead>
             <tbody>

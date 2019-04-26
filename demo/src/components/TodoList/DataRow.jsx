@@ -6,7 +6,6 @@ export default ({
     title,
     author,
     commenters,
-    email,
     star,
     onStar,
     onStarTransient,
@@ -50,7 +49,6 @@ export default ({
                 {' '}
                 {commenters.length}
             </td>
-            <td>{email}</td>
             <td className={cx('operation')}>
                 {' '}
                 {
@@ -74,7 +72,7 @@ export default ({
                     (onStarTransient && !onStarTransient.isLoading && onStarTransient.error) && (
                         <button
                             type="button"
-                            className={cx('error', 'no-border', e2e('confirm-star-error'))}
+                            className={cx('text', 'text-danger', 'no-border', e2e('confirm-star-error'))}
                             onClick={handleConfirmError}
                         >
                             Failed! Click to Dimiss!

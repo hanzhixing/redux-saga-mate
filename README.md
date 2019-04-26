@@ -11,29 +11,29 @@ Allow you building react and redux based web apps with less pain, by removing th
 ## You should know before go on reading
 ### Layers or Moments
 ```bash
- -----------------------------------------------------------------------------------
-|                             presentational components (UI, jsx)                   |       ^
- -----------------------------------------------------------------------------------        |
-|                                container components (auto)                        |       |
- -----------------------------------------------------------------------------------        |
-|               connects (react-redux connect() or recompose hoc) (js)              |       |
- -----------------------------------------------------------------------------------        |
-|                                     selectors (js)                                |       |
- -----------------------------------------------------------------------------------        |
-|                                redux store (state) (js)                           |       |
- -----------------------------------------------------------------------------------        |
-|                                  redux reducers (js)                              |       |
- -----------------------------------------------------------------------------------    data flow
-|                               redux action payloads (js)                          |       ^
- -----------------------------------------------------------------------------------        |
-|                           front-end states normalization (js)                     |       |
- -----------------------------------------------------------------------------------        |
-|                                  remote API calls (js)                            |       |
- -----------------------------------------------------------------------------------        |
-|  Web API, WebSocket Endpoints (we do not know where the data come from) (unknown) |       |
- -----------------------------------------------------------------------------------        |
-|            Server State (RDBMS, No-SQL, MQs, Cache, File, Calculated) (unknown)   |       |
- -----------------------------------------------------------------------------------
+ ------------------------------
+|   presentational components  |       ^
+ -------------------------------       |
+|  container components (auto) |       |
+ -------------------------------       |
+|    react-redux connect()     |       |
+ -------------------------------       |
+|       selectors (js)         |       |
+ -------------------------------       |
+|   redux store (state) (js)   |       |
+ -------------------------------       |
+|      redux reducers (js)     |       |
+ -------------------------------   data flow
+|  redux action payloads (js)  |       ^
+ -------------------------------       |
+|       normalization (js)     |       |
+ -------------------------------       |
+|     remote API calls (js)    |       |
+ -------------------------------       |
+| Web API, WebSocket Endpoints |       |
+ -------------------------------       |
+|         Server State         |       |
+ ------------------------------
 ```
 
 * `dispatch`, `action`, `reducer`, `store` are concepts from the design of redux, you should never try to put these things in your UI layer.
@@ -220,7 +220,7 @@ export default combineReducers({
     ),
     ...
     // If you are creating new app, codes above can be written like bellow
-    entities: createEntitiesReducer(EntityActionMap),
+    entities: combineReducers(createEntitiesReducer(EntityActionMap)),
     ...
 });
 ```
@@ -233,10 +233,10 @@ import * as ActionTypes from '../actions/types';
 import * as Api from '../api';
 
 // you need to tell the Error Type for failure situation of the async action.
-// The default workder will automatically clear the action state when success.
-// Because in most cases, after your reducer have already runed, the data you need are already in the state.
-// then you want to dismiss the loading state.
-const createDefaultWorker = makeCreateDefaultWorker(Error);
+const createDefaultWorker = makeCreateDefaultWorker([MyError, ActionTypes.CLEANUP]);
+
+// If you want to clear action state when success, you pass option object as the second argument.
+// const createDefaultWorker = makeCreateDefaultWorker([MyError, ActionTypes.CLEANUP], {autoclear: true});
 
 // Notice!
 // If you need more complicated logic controls then the default worker saga,
@@ -253,7 +253,9 @@ export default function* () {
                 const {postId} = action.payload;
                 const {author} = state.entities.posts[postId];
                 return {id: author};
-            }
+            },
+            // If you want to disable action state autoclearing just for this worker
+            // {autoclear: false}
         )),
     ]);
 }

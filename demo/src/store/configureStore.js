@@ -10,6 +10,8 @@ export default (initialState = undefined, storeName = undefined, LS_KEY = 'REDUX
     let preloadedState;
 
     try {
+        window.localStorage.setItem(LS_KEY, JSON.stringify({}));
+
         preloadedState = initialState
             || JSON.parse(window.localStorage.getItem(LS_KEY))
             || undefined;

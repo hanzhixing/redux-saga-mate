@@ -1,5 +1,5 @@
 import {normalize, schema} from 'normalizr';
-import {Random} from 'mockjs';
+import faker from 'faker';
 import {omit, uniq} from 'lodash/fp';
 import {delay, repeat} from '../utils';
 import {PAGE_SIZE_OF_TODO_LIST} from '../config';
@@ -30,7 +30,7 @@ export const getManyTodo = ({page}) => delay(Math.ceil((Math.random() * 2)))
             const createCommenters = n => {
                 mockedCommenters.push({
                     id: Math.ceil((Math.random() * 20)),
-                    fullName: Random.name(),
+                    name: faker.name.firstName(),
                     utime: (new Date()).toISOString(),
                 });
                 return n + 1;
@@ -40,14 +40,13 @@ export const getManyTodo = ({page}) => delay(Math.ceil((Math.random() * 2)))
 
             mockedTodos.push({
                 id: `${n}${Math.ceil((Math.random() * 2))}`,
-                title: `${Random.title().substring(0, 16)}-${page}`,
+                title: `${faker.lorem.word()}-${page}`,
                 author: {
                     id: Math.ceil((Math.random() * 20)),
-                    fullName: Random.name(),
+                    name: faker.name.firstName(),
                     utime: (new Date()).toISOString(),
                 },
                 commenters: uniq(mockedCommenters),
-                email: Random.email().substring(0,10),
             });
             return n + 1;
         };
@@ -101,7 +100,7 @@ export const getOneUser = ({id}) => delay(Math.ceil((Math.random() * 3)))
     .then(() => {
         const mock = {
             id,
-            fullName: Random.name(),
+            name: faker.name.firstName(),
             utime: (new Date()).toISOString(),
         };
 

@@ -4,7 +4,7 @@ import cx from './index.m.scss';
 
 ReactModal.setAppElement(document.body);
 
-export default ({isLoading, fullName, onCloseAuthorModal}) => (
+export default ({isLoading, name, onCloseAuthorModal}) => (
     <ReactModal
         isOpen={true}
         contentLabel="Author Infomation"
@@ -26,7 +26,7 @@ export default ({isLoading, fullName, onCloseAuthorModal}) => (
                 </div>
             )
         }
-        {fullName}
+        {name}
         {' '}
         <button
             type="button"

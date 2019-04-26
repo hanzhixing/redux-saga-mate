@@ -3,7 +3,7 @@ import cx from './index.m.scss';
 
 export default ({buffer, onAccept}) => (
     <tr key="buffer">
-        <td colSpan="5" className="text-center">
+        <td colSpan="4" className="text-center">
             {`${buffer.length} new records, click to`}
             {' '}
             <button
