@@ -8,6 +8,8 @@ export {
     continueWith,
     succeedWith,
     failWith,
+    isChildOf,
+    makeChildOf,
 } from './action';
 
 export {
