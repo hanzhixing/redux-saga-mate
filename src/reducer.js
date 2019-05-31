@@ -7,12 +7,14 @@ import mergeWith from 'ramda/src/mergeWith';
 import keys from 'ramda/src/keys';
 import reduce from 'ramda/src/reduce';
 import uniq from 'ramda/src/uniq';
+import path from 'ramda/src/path';
 import flatten from 'ramda/src/flatten';
 import map from 'ramda/src/map';
 import set from 'ramda/src/set';
 import lensProp from 'ramda/src/lensProp';
 import {isFinished} from './action';
 import {UPDATE, DELETE} from './operation';
+import {SIGN} from './sign';
 
 const DEFAULT_CLEANUP_ACTION_TYPE = 'CLEANUP_TRACKABLE_ACTION';
 const DEFAULT_ASYNC_ACTION_TYPE_REGEX = /^(REST|API|LOAD|ASYNC|FETCH|AJAX)_[0-9A-Z_]+$/;
@@ -26,6 +28,11 @@ export const createActionsReducer = ([
 ]) => (state = {}, action) => {
     if (action.type === CleanupActionType) {
         return Array.isArray(action.payload) ? omit(action.payload, state) : omit([action.payload], state);
+    }
+
+    // by pass unrecognized actions which may also match AsyncActionTypeRegex
+    if (!action.meta || action.meta.sign !== SIGN) {
+        return state;
     }
 
     if (AsyncActionTypeRegex.test(action.type)) {

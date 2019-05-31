@@ -4,6 +4,7 @@ import {isFSA} from 'flux-standard-action';
 import uuidv5 from 'uuid/v5';
 import {FluxStandardActionError} from './error';
 import {PHASE_GHOST, PHASE_STARTED, PHASE_RUNNING, PHASE_FINISH} from './phase';
+import {SIGN} from './sign';
 
 const UUID_NULL = '00000000-0000-0000-0000-000000000000';
 
@@ -44,6 +45,7 @@ export const makeTrackable = action => {
             id: idOfAction(action),
             pid: undefined,
             ctime: (new Date()).toISOString(),
+            sign: SIGN,
         },
     };
 };

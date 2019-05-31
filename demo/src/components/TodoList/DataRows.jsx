@@ -11,7 +11,7 @@ export default ({
     onViewAuthor,
     onToggleCheck,
     transients,
-}) =>items.map(item => (
+}) => items.map(item => (
     <DataRow
         key={item.id}
         {...item}
