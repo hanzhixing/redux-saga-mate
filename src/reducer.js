@@ -30,8 +30,8 @@ export const createActionsReducer = ([
         return Array.isArray(action.payload) ? omit(action.payload, state) : omit([action.payload], state);
     }
 
-    // by pass unrecognized actions which may also match AsyncActionTypeRegex
-    if (!action.meta || action.meta.sign !== SIGN) {
+    // there is nothing we can do without `meta.id`
+    if (!action.meta || !action.meta.id) {
         return state;
     }
 
@@ -56,9 +56,9 @@ export const createEntityTypeReducer = (entityType, operations) => (state = {}, 
         if (operation === UPDATE) {
             const getNewPayload = () => {
                 if (action.payload.response) {
-                    return action.payload.response.entities[entityType];
+                    return action.payload.response.entities[entityType] || {};
                 }
-                return action.payload.entities[entityType];
+                return action.payload.entities[entityType] || {};
             };
             if (merger) {
                 return mergeDeepWithKey(merger, state, getNewPayload());
