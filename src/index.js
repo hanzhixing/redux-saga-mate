@@ -1,3 +1,5 @@
+import {UPDATE, DELETE} from './operation';
+
 export {
     createAsyncAction,
     makeActionAsync,
@@ -23,4 +25,6 @@ export {makeCreateDefaultWorker} from './saga';
 
 export {createSelectActions} from './selector';
 
-export {UPDATE, DELETE} from './operation';
+export {UPDATE, DELETE};
+
+export const EntityOperations = {UPDATE, DELETE};
