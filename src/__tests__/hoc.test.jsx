@@ -1,5 +1,5 @@
 import {shallow, mount} from 'enzyme';
-import {render} from 'react-testing-library';
+import {render} from '@testing-library/react';
 import {withAsyncActionStateHandler, createAsyncActionContext} from '../hoc';
 
 describe('withAsyncActionStateHandler', () => {

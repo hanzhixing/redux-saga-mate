@@ -1,3 +1,4 @@
+/* global document */
 import ReactModal from 'react-modal';
 import {e2e} from '../../utils';
 import cx from './index.m.scss';

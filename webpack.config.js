@@ -98,11 +98,13 @@ module.exports = (cliEnv = {}, argv) => {
         entry: {
             index: [
                 'abortcontroller-polyfill/dist/polyfill-patch-fetch',
-                '@babel/polyfill',
+                'core-js/stable',
+                'regenerator-runtime/runtime',
                 path.resolve(__dirname, 'demo/src/index'),
             ],
             '404': [
-                '@babel/polyfill',
+                'core-js/stable',
+                'regenerator-runtime/runtime',
                 path.resolve(__dirname, 'demo/src/404'),
             ]
         },
@@ -230,8 +232,9 @@ module.exports = (cliEnv = {}, argv) => {
                             use: getStyleLoaders({
                                 importLoaders: 1,
                                 sourceMap: isProd &&  true,
-                                modules: true,
-                                localIdentName: '[path][name]__[local]--[hash:base64:5]',
+                                modules: {
+                                    localIdentName: '[path][name]__[local]--[hash:base64:5]',
+                                },
                             }),
                         },
                         {
@@ -252,8 +255,9 @@ module.exports = (cliEnv = {}, argv) => {
                                 {
                                     importLoaders: 2,
                                     sourceMap: isProd &&  true,
-                                    modules: true,
-                                    localIdentName: '[path][name]__[local]--[hash:base64:5]',
+                                    modules: {
+                                        localIdentName: '[path][name]__[local]--[hash:base64:5]',
+                                    },
                                 },
                                 'sass-loader'
                             ),

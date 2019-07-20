@@ -1,3 +1,4 @@
+/* global window */
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom'
 import {compose, lifecycle, withState, withProps} from 'recompose';
@@ -8,6 +9,8 @@ import TodoList from '../../components/TodoList';
 import {withAsyncActionContextProvider, withAsyncActionContextConsumer, mapAsyncActionProps} from './actions';
 import {selectActions, selectTodos, selectTodosBuffer, selectModalAuthor} from './selectors';
 import * as ActionTypes from '../../actions/types';
+
+const {AbortController} = window;
 
 const makeMapStateToProps = () => createSelector(
     selectTodos,

@@ -1,3 +1,4 @@
+/* global window */
 import store from 'store';
 import history from './history';
 import {LOCAL_STORAGE_PATH_BEFORE_404} from './config';

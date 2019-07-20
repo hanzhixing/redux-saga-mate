@@ -1,3 +1,6 @@
+/* global window */
+const {DOMException} = window;
+
 export const delay = (seconds, signal = {}) => {
     if (signal.aborted) {
         return Promise.reject(new DOMException('Aborted', 'AbortError'));

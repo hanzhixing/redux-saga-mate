@@ -1,3 +1,4 @@
+/* global document */
 import stringify from 'json-stable-stringify';
 import {createAction} from 'redux-actions';
 import {isFSA} from 'flux-standard-action';
