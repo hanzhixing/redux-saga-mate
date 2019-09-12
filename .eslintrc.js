@@ -1,4 +1,7 @@
 module.exports = {
+    "env": {
+        "jest": true,
+    },
     "parser": "babel-eslint",
     "extends": [
         "eslint:recommended",
@@ -7,7 +10,8 @@ module.exports = {
     ],
     "plugins": [
         "react",
-        "prettier"
+        "jest",
+        "prettier",
     ],
     "rules": {
         "prettier/prettier": ["off"],

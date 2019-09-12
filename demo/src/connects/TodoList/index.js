@@ -66,7 +66,7 @@ const withLifecycle = lifecycle({
 
         const {page, onPage} = this.props;
 
-        delay(2, this.controller.signal).then(() => (onPage(page)));
+        delay(0, this.controller.signal).then(() => (onPage(page)));
     },
     componentDidUpdate(prevProps) {
         const {page, onPage} = this.props;
@@ -75,7 +75,7 @@ const withLifecycle = lifecycle({
             return;
         }
 
-        delay(2, this.controller.signal).then(() => (onPage(page)));
+        delay(0, this.controller.signal).then(() => (onPage(page)));
     },
     componentWillUnmount() {
         this.controller.abort();

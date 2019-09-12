@@ -85,25 +85,28 @@ describe('createAsyncActionContext', () => {
         withAsyncActionContextConsumer,
     } = createAsyncActionContext();
 
-    const Parent = () => {
-        console.log(111);
-        return null;
-    }
-    const Child = () => {
-        console.log(222);
-        return <div />;
-    }
+    const Child = props => null;
 
-    const EnhancedParent = withAsyncActionContextProvider(Parent);
     const EnhancedChild = withAsyncActionContextConsumer(Child);
 
-    it('should update actionIs by setActionId, and delete actionIds by unsetActionId', () => {
-        const {container, wrapper} = render(
-            <EnhancedParent>
-                <EnhancedChild foo="bar" />
-            </EnhancedParent>
+    const Parent = props => (<EnhancedChild bar="bar" />);
+
+    const EnhancedParent = withAsyncActionContextProvider(Parent);
+
+    it('should pass actionIds, setActionId, unsetActionId as props additionally by internal consumer', () => {
+        const wrapper = mount(
+            <EnhancedParent foo="foo" />
         );
 
-        console.log(container);
+        const desired = {
+            actionIds: {},
+            setActionId: expect.any(Function),
+            unsetActionId: expect.any(Function),
+            bar: 'bar',
+        };
+
+        expect(wrapper.find(Child).props()).toMatchObject(desired);
+
+        wrapper.unmount();
     });
 });

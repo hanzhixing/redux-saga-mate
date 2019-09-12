@@ -5,6 +5,7 @@ import {
     pidOfAction,
     makeTrackable,
     trackFor,
+    isUnique,
     isStarted,
     isRunning,
     isFinished,
@@ -15,6 +16,7 @@ import {
     makeChildOf,
     makeActionAsync,
     createAsyncAction,
+    createAsyncActionUnique,
 } from '../action';
 
 const REGEX_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -22,6 +24,11 @@ const REGEX_ISO8601 = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 
 describe('idOfAction', () => {
     const action = {
+        type: 'type',
+        payload: 'payload1',
+    };
+
+    const actionSame = {
         type: 'type',
         payload: 'payload1',
     };
@@ -61,6 +68,17 @@ describe('idOfAction', () => {
     it('should generate different ids for different actions', () => {
         expect(idOfAction(action2)).not.toBe(idOfAction(action1));
         expect(idOfAction(action4)).not.toBe(idOfAction(action3));
+    });
+
+    it('should generate different ids for same action if uniq flag is true', () => {
+        jest.useFakeTimers();
+        const id = idOfAction(action, true);
+
+        setTimeout(() => {
+            expect(idOfAction(action1, true)).not.toBe(id);
+        }, 1);
+        jest.runAllTimers();
+        jest.clearAllTimers();
     });
 });
 
@@ -139,6 +157,19 @@ describe('trackFor', () => {
 
     it('should attach id of the parent to the child', () => {
         expect(trackFor(parent)(child).meta.pid).toBe(enhancedParent.meta.id);
+    });
+});
+
+describe('isUnique', () => {
+    const action = {
+        type: 'type',
+        payload: 'payload',
+    };
+
+    const enhanced = makeActionAsync(action, true);
+
+    it('should be TRUE if the action is unique', () => {
+        expect(isUnique(enhanced)).toBe(true);
     });
 });
 
@@ -431,5 +462,29 @@ describe('createAsyncAction', () => {
 
     it('should fill meta with correct properties', () => {
         expect(createAsyncAction(action.type)(action.payload)).toMatchObject(desired);
+    });
+});
+
+describe('createAsyncActionUnique', () => {
+    const action = {
+        type: 'type',
+        payload: 'payload',
+    };
+
+    const desired = {
+        type: 'type',
+        payload: 'payload',
+        meta: {
+            id: expect.stringMatching(REGEX_UUID),
+            pid: undefined,
+            ctime: expect.stringMatching(REGEX_ISO8601),
+            phase: PHASE_STARTED,
+            uniq: true,
+            progress: 0,
+        },
+    };
+
+    it('should fill meta with correct properties', () => {
+        expect(createAsyncActionUnique(action.type)(action.payload)).toMatchObject(desired);
     });
 });

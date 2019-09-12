@@ -11,7 +11,7 @@ const UUID_NULL = '00000000-0000-0000-0000-000000000000';
 
 const UUID_NAMESPACE = uuidv5(document.domain, UUID_NULL);
 
-export const idOfAction = action => {
+export const idOfAction = (action, uniq = false) => {
     if (!isFSA(action)) {
         throw new FluxStandardActionError();
     }
@@ -22,7 +22,9 @@ export const idOfAction = action => {
         return meta.id;
     }
 
-    return uuidv5(stringify([type, payload]), UUID_NAMESPACE);
+    const signal = uniq ? [type, payload, Date.now()] : [type, payload];
+
+    return uuidv5(stringify(signal), UUID_NAMESPACE);
 };
 
 export const pidOfAction = action => {
@@ -35,7 +37,7 @@ export const pidOfAction = action => {
     return meta ? meta.pid : undefined;
 };
 
-export const makeTrackable = action => {
+export const makeTrackable = (action, uniq) => {
     if (!isFSA(action)) {
         throw new FluxStandardActionError();
     }
@@ -43,10 +45,11 @@ export const makeTrackable = action => {
     return {
         ...action,
         meta: {
-            id: idOfAction(action),
+            id: idOfAction(action, uniq),
             pid: undefined,
             ctime: (new Date()).toISOString(),
             sign: SIGN,
+            uniq,
         },
     };
 };
@@ -66,6 +69,7 @@ export const trackFor = parent => child => {
     };
 };
 
+export const isUnique = action => action.meta.uniq === true;
 export const isStarted = action => action.meta.phase === PHASE_STARTED;
 export const isRunning = action => action.meta.phase === PHASE_RUNNING;
 export const isFinished = action => action.meta.phase === PHASE_FINISH;
@@ -146,12 +150,12 @@ export const makeChildOf = parent => child => {
     };
 };
 
-export const makeActionAsync = action => {
+export const makeActionAsync = (action, uniq) => {
     if (!isFSA(action)) {
         throw new FluxStandardActionError();
     }
 
-    const trackableAction = makeTrackable(action);
+    const trackableAction = makeTrackable(action, uniq);
 
     return {
         ...trackableAction,
@@ -164,3 +168,5 @@ export const makeActionAsync = action => {
 };
 
 export const createAsyncAction = type => payload => makeActionAsync(createAction(type)(payload));
+
+export const createAsyncActionUnique = type => payload => makeActionAsync(createAction(type)(payload), true);

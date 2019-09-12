@@ -2,6 +2,7 @@ import {UPDATE, DELETE} from './operation';
 
 export {
     createAsyncAction,
+    createAsyncActionUnique,
     makeActionAsync,
     idOfAction,
     isFinished,
