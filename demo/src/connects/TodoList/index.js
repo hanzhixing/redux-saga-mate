@@ -1,6 +1,6 @@
 /* global window */
 import {connect} from 'react-redux';
-import {withRouter} from 'react-router-dom'
+import {withRouter} from 'react-router-dom';
 import {compose, lifecycle, withState, withProps} from 'recompose';
 import {createSelector} from 'reselect';
 import {createAsyncAction, idOfAction} from 'redux-saga-mate';
@@ -27,36 +27,36 @@ const makeMapStateToProps = () => createSelector(
     }),
 );
 
-const mapDispatchToProps = (dispatch, props) => {
-    // console.log(props);
-    return {
-        onPage: page => {
-            const actionId = idOfAction(dispatch(createAsyncAction(ActionTypes.ASYNC_GET_MANY_TODO)({
-                page,
-            })));
-            props.onTrackAsyncAction(['onPage', page], actionId);
-        },
-        onCloseAuthorModal: () => {
-            props.setModalTodoAuthor(undefined);
-        },
-        onBatchStar: () => {
-            props.selected.forEach(id => {
-                const actionId = idOfAction(dispatch(createAsyncAction(ActionTypes.ASYNC_PATCH_ONE_TODO)({id})));
-                props.onTrackAsyncAction(['onStar', id], actionId);
-            });
-        },
-        onToggleCheck: id => {
-            if (props.selected.includes(id)) {
-                props.setSelected(props.selected.filter(item => item !== id));
-            } else {
-                props.setSelected([...props.selected, id]);
-            }
-        },
-        onViewAuthor: id => {
-            props.setModalTodoAuthor(id);
-        },
-    };
-};
+const mapDispatchToProps = (dispatch, {
+    onTrackAsyncAction,
+    setModalTodoAuthor,
+    selected,
+    setSelected,
+}) => ({
+    onPage: page => {
+        const action = dispatch(createAsyncAction(ActionTypes.ASYNC_GET_MANY_TODO)({page}));
+        onTrackAsyncAction(['onPage', page], idOfAction(action));
+    },
+    onCloseAuthorModal: () => {
+        setModalTodoAuthor(undefined);
+    },
+    onBatchStar: () => {
+        selected.forEach(id => {
+            const action = dispatch(createAsyncAction(ActionTypes.ASYNC_PATCH_ONE_TODO)({id}));
+            onTrackAsyncAction(['onStar', id], idOfAction(action));
+        });
+    },
+    onToggleCheck: id => {
+        if (selected.includes(id)) {
+            setSelected(selected.filter(item => item !== id));
+        } else {
+            setSelected([...selected, id]);
+        }
+    },
+    onViewAuthor: id => {
+        setModalTodoAuthor(id);
+    },
+});
 
 const withRedux = connect(makeMapStateToProps, mapDispatchToProps);
 

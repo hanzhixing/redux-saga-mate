@@ -1,7 +1,7 @@
 import {e2e} from '../../utils';
 import cx from './index.m.scss';
 
-export default ({
+const DataRow = ({
     id,
     title,
     author,
@@ -24,11 +24,11 @@ export default ({
 
     const handleViewAuthor = () => {
         onViewAuthor(id);
-    }
+    };
 
     const handleToggleCheck = () => {
         onToggleCheck(id);
-    }
+    };
 
     return (
         <tr>
@@ -51,22 +51,18 @@ export default ({
             </td>
             <td className={cx('operation')}>
                 {' '}
-                {
-                    onStarTransient && onStarTransient.isLoading && (
-                        <div className="spinner-border spinner-border-sm" role="status">
-                            <span className="sr-only">Loading...</span>
-                        </div>
-                    )
-                }
-                {
-                    (!onStarTransient || !onStarTransient.isLoading) && (
-                        <button
-                            type="button"
-                            onClick={handleStar}
-                            className={cx('oi oi-star', 'no-border', {star}, e2e('star-todo'))}
-                        />
-                    )
-                }
+                {onStarTransient && onStarTransient.isLoading && (
+                    <div className="spinner-border spinner-border-sm" role="status">
+                        <span className="sr-only">Loading...</span>
+                    </div>
+                )}
+                {(!onStarTransient || !onStarTransient.isLoading) && (
+                    <button
+                        type="button"
+                        onClick={handleStar}
+                        className={cx('oi oi-star', 'no-border', {star}, e2e('star-todo'))}
+                    />
+                )}
                 {' '}
                 {
                     (onStarTransient && !onStarTransient.isLoading && onStarTransient.error) && (
@@ -83,3 +79,5 @@ export default ({
         </tr>
     );
 };
+
+export default DataRow;

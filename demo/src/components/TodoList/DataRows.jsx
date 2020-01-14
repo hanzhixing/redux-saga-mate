@@ -1,8 +1,7 @@
 import {get} from 'lodash/fp';
 import DataRow from './DataRow';
 
-export default ({
-    page,
+const DataRows = ({
     items,
     selected,
     onStar,
@@ -10,7 +9,6 @@ export default ({
     onClearStarLoading,
     onViewAuthor,
     onToggleCheck,
-    transients,
 }) => items.map(item => (
     <DataRow
         key={item.id}
@@ -23,3 +21,5 @@ export default ({
         onClearStarLoading={onClearStarLoading}
     />
 ));
+
+export default DataRows;

@@ -25,12 +25,21 @@ const EntityActionMap = {
     },
 };
 
+const locators = {
+    UPDATE: [
+        ['response', 'entities'],
+    ],
+    DELETE: [
+        ['request', 'params', 'id'],
+    ],
+};
+
 export default combineReducers({
     actions: createActionsReducer([ActionTypes.CLEANUP, /^ASYNC_/]),
-    session: (state = {}, action) => state,
+    session: (state = {}) => state,
     entities: combineReducers(
         groupByComposeByEntityType(
-            createEntitiesReducer(EntityActionMap),
+            createEntitiesReducer(locators, EntityActionMap),
             {},
         ),
     ),

@@ -1,9 +1,9 @@
-import {PHASE_GHOST, PHASE_STARTED, PHASE_RUNNING, PHASE_FINISH} from '../phase';
-import {FluxStandardActionError} from '../error';
+import {PHASE_STARTED, PHASE_RUNNING, PHASE_FINISH} from '../phase';
 import {
+    isReduxSagaMateAction,
     idOfAction,
     pidOfAction,
-    makeTrackable,
+    createTrackableAction,
     trackFor,
     isUnique,
     isStarted,
@@ -14,7 +14,6 @@ import {
     failWith,
     isChildOf,
     makeChildOf,
-    makeActionAsync,
     createAsyncAction,
     createAsyncActionUnique,
 } from '../action';
@@ -22,13 +21,69 @@ import {
 const REGEX_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const REGEX_ISO8601 = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 
+class Foo {}
+
+describe('isReduxSagaMateAction', () => {
+    it('should return FALSE if the action is not plain object', () => {
+        [
+            'string',
+            1,
+            true,
+            undefined,
+            null,
+            [],
+            () => {},
+            new Foo(),
+            /regex/,
+        ].forEach(v => {
+            expect(isReduxSagaMateAction(v)).toBe(false);
+        });
+    });
+
+    it('should return FALSE if the action type is not string', () => {
+        [
+            1,
+            true,
+            undefined,
+            null,
+            [],
+            () => {},
+            new Foo(),
+            /regex/,
+        ].forEach(v => {
+            expect(isReduxSagaMateAction({type: v})).toBe(false);
+        });
+    });
+
+    it('should return FALSE if the action has property unknown', () => {
+        expect(isReduxSagaMateAction({type: 'type', foo: 'foo'})).toBe(false);
+    });
+
+    it('should return FALSE if the action has meta but in wrong type', () => {
+        [
+            'string',
+            1,
+            true,
+            [],
+            () => {},
+            new Foo(),
+            /regex/,
+        ].forEach(v => {
+            expect(isReduxSagaMateAction({type: 'type', meta: v})).toBe(false);
+        });
+    });
+
+    it('should return FALSE if the action has meta but has property unknown', () => {
+        expect(isReduxSagaMateAction({type: 'type', meta: {foo: 'foo'}})).toBe(false);
+    });
+
+    it('should return TRUE if the action has type in string and no meta', () => {
+        expect(isReduxSagaMateAction({type: 'type'})).toBe(true);
+    });
+});
+
 describe('idOfAction', () => {
     const action = {
-        type: 'type',
-        payload: 'payload1',
-    };
-
-    const actionSame = {
         type: 'type',
         payload: 'payload1',
     };
@@ -54,7 +109,7 @@ describe('idOfAction', () => {
     };
 
     it('should throw error if the action is not FSA', () => {
-        expect(() => idOfAction({a: 'a', b: 'b'})).toThrow(FluxStandardActionError);
+        expect(() => idOfAction({a: 'a', b: 'b'})).toThrow(Error);
     });
 
     it('should generate id in uuid format', () => {
@@ -83,19 +138,18 @@ describe('idOfAction', () => {
 });
 
 describe('pidOfAction', () => {
-    const action = {
-        type: 'type',
-        payload: 'payload',
-        meta: {
-            pid: 'pid',
-        },
-    };
-
     it('should throw error if the action is not FSA', () => {
-        expect(() => pidOfAction({a: 'a', b: 'b'})).toThrow(FluxStandardActionError);
+        expect(() => pidOfAction({a: 'a', b: 'b'})).toThrow(Error);
     });
 
     it('should return the pid of the action', () => {
+        const action = {
+            type: 'type',
+            payload: 'payload',
+            meta: {
+                pid: 'pid',
+            },
+        };
         expect(pidOfAction(action)).toBe(action.meta.pid);
     });
 
@@ -108,7 +162,7 @@ describe('pidOfAction', () => {
     });
 });
 
-describe('makeTrackable', () => {
+describe('createTrackableAction', () => {
     const action = {
         type: 'type',
         payload: 'payload',
@@ -124,16 +178,17 @@ describe('makeTrackable', () => {
         },
     };
 
-    it('should throw error if the action is not FSA', () => {
-        expect(() => makeTrackable({a: 'a', b: 'b'})).toThrow(FluxStandardActionError);
+    it('should throw error if the action is not a ReduxSagaMateAction', () => {
+        expect(() => createTrackableAction({a: 'a', b: 'b'})).toThrow(Error);
     });
 
     it('should fill meta with correct properties', () => {
-        expect(makeTrackable(action)).toMatchObject(desired);
+        expect(createTrackableAction(action)).toMatchObject(desired);
     });
 
     it('should generates a ctime before now at most in 1 second', () => {
-        expect(Date.parse(makeTrackable(action).meta.ctime)).toBeGreaterThanOrEqual(Date.now() - 1000);
+        expect(Date.parse(createTrackableAction(action).meta.ctime))
+            .toBeGreaterThanOrEqual(Date.now() - 1000);
     });
 });
 
@@ -148,12 +203,12 @@ describe('trackFor', () => {
         payload: 'parent',
     };
 
-    it('should throw error if the action is not FSA', () => {
-        expect(() => trackFor({a: 'a'})({b: 'b'})).toThrow(FluxStandardActionError);
+    it('should throw error if the action is not a ReduxSagaMateAction', () => {
+        expect(() => trackFor({a: 'a'})(undefined)).toThrow(Error);
+        expect(() => trackFor({type: 'type'})({a: 'a'})).toThrow(Error);
     });
 
-    const enhancedChild = makeActionAsync(child);
-    const enhancedParent = makeActionAsync(parent);
+    const enhancedParent = createAsyncAction(parent.type)(parent.payload);
 
     it('should attach id of the parent to the child', () => {
         expect(trackFor(parent)(child).meta.pid).toBe(enhancedParent.meta.id);
@@ -166,7 +221,7 @@ describe('isUnique', () => {
         payload: 'payload',
     };
 
-    const enhanced = makeActionAsync(action, true);
+    const enhanced = createAsyncActionUnique(action.type)(action.payload);
 
     it('should be TRUE if the action is unique', () => {
         expect(isUnique(enhanced)).toBe(true);
@@ -179,7 +234,7 @@ describe('isStarted', () => {
         payload: 'payload',
     };
 
-    const enhanced = makeActionAsync(action);
+    const enhanced = createAsyncAction(action.type)(action.payload);
 
     it('should be TRUE if the action is branch new', () => {
         expect(isStarted(enhanced)).toBe(true);
@@ -204,7 +259,7 @@ describe('isRunning', () => {
         payload: 'payload',
     };
 
-    const enhanced = makeActionAsync(action);
+    const enhanced = createAsyncAction(action.type)(action.payload);
 
     it('should be FALSE if the action is branch new', () => {
         expect(isRunning(enhanced)).toBe(false);
@@ -229,7 +284,7 @@ describe('isFinished', () => {
         payload: 'payload',
     };
 
-    const enhanced = makeActionAsync(action);
+    const enhanced = createAsyncAction(action.type)(action.payload);
 
     it('should be FALSE if the action is branch new', () => {
         expect(isFinished(enhanced)).toBe(false);
@@ -254,7 +309,7 @@ describe('continueWith', () => {
         payload: 'payload',
     };
 
-    const enhanced = makeTrackable(action);
+    const enhanced = createTrackableAction(action);
 
     const payload = 'to be continue';
 
@@ -267,11 +322,11 @@ describe('continueWith', () => {
             phase: PHASE_RUNNING,
             progress: 50,
             utime: expect.stringMatching(REGEX_ISO8601),
-        }
+        },
     };
 
     it('should throw error if the action is not FSA', () => {
-        expect(() => continueWith('hello')({a: 'a', b: 'b'})).toThrow(FluxStandardActionError);
+        expect(() => continueWith('hello')({a: 'a', b: 'b'})).toThrow(Error);
     });
 
     it('should fill meta with continue signal and new payload', () => {
@@ -279,7 +334,8 @@ describe('continueWith', () => {
     });
 
     it('should generates a utime before now at most in 1 second', () => {
-        expect(Date.parse(continueWith(payload, 50)(enhanced).meta.utime)).toBeGreaterThanOrEqual(Date.now() - 1000);
+        expect(Date.parse(continueWith(payload, 50)(enhanced).meta.utime))
+            .toBeGreaterThanOrEqual(Date.now() - 1000);
     });
 });
 
@@ -289,7 +345,7 @@ describe('succeedWith', () => {
         payload: 'payload',
     };
 
-    const enhanced = makeTrackable(action);
+    const enhanced = createTrackableAction(action);
 
     const desired = {
         ...enhanced,
@@ -300,13 +356,13 @@ describe('succeedWith', () => {
             phase: PHASE_FINISH,
             progress: 100,
             utime: expect.stringMatching(REGEX_ISO8601),
-        }
+        },
     };
 
     const payload = 'success';
 
     it('should throw error if the action is not FSA', () => {
-        expect(() => succeedWith('hello')({a: 'a', b: 'b'})).toThrow(FluxStandardActionError);
+        expect(() => succeedWith('hello')({a: 'a', b: 'b'})).toThrow(Error);
     });
 
     it('should fill meta with finished signal and new payload', () => {
@@ -314,7 +370,8 @@ describe('succeedWith', () => {
     });
 
     it('should generates a utime before now at most in 1 second', () => {
-        expect(Date.parse(succeedWith(payload)(enhanced).meta.utime)).toBeGreaterThanOrEqual(Date.now() - 1000);
+        expect(Date.parse(succeedWith(payload)(enhanced).meta.utime))
+            .toBeGreaterThanOrEqual(Date.now() - 1000);
     });
 });
 
@@ -324,7 +381,7 @@ describe('failWith', () => {
         payload: 'payload',
     };
 
-    const enhanced = makeTrackable(action);
+    const enhanced = createTrackableAction(action);
 
     const error = new Error('success');
 
@@ -338,11 +395,11 @@ describe('failWith', () => {
             phase: PHASE_FINISH,
             progress: 100,
             utime: expect.stringMatching(REGEX_ISO8601),
-        }
+        },
     };
 
     it('should throw error if the action is not FSA', () => {
-        expect(() => failWith('hello')({a: 'a', b: 'b'})).toThrow(FluxStandardActionError);
+        expect(() => failWith('hello')({a: 'a', b: 'b'})).toThrow(Error);
     });
 
     it('should fill meta with failed signal and error object as payload', () => {
@@ -350,7 +407,8 @@ describe('failWith', () => {
     });
 
     it('should generates a utime before now at most in 1 second', () => {
-        expect(Date.parse(succeedWith(error)(enhanced).meta.utime)).toBeGreaterThanOrEqual(Date.now() - 1000);
+        expect(Date.parse(succeedWith(error)(enhanced).meta.utime))
+            .toBeGreaterThanOrEqual(Date.now() - 1000);
     });
 });
 
@@ -360,7 +418,7 @@ describe('isChildOf', () => {
         payload: 'child',
         meta: {
             pid: 'pid',
-        }
+        },
     };
 
     const child2 = {
@@ -368,7 +426,7 @@ describe('isChildOf', () => {
         payload: 'child',
         meta: {
             pid: 'pid2',
-        }
+        },
     };
 
     const parent = {
@@ -376,11 +434,12 @@ describe('isChildOf', () => {
         payload: 'parent',
         meta: {
             id: 'pid',
-        }
+        },
     };
 
-    it('should throw error if the action is not FSA', () => {
-        expect(() => isChildOf({a: 'a'})({b: 'b'})).toThrow(FluxStandardActionError);
+    it('should throw error if the action is not a ReduxSagaMateAction', () => {
+        expect(() => isChildOf({a: 'a'})(undefined)).toThrow(Error);
+        expect(() => isChildOf({type: 'type'})({a: 'a'})).toThrow(Error);
     });
 
     it('should be TRUE if the pid of the child is the same as the id of parent', () => {
@@ -403,42 +462,16 @@ describe('makeChildOf', () => {
         payload: 'parent',
         meta: {
             id: 'pid',
-        }
+        },
     };
 
-    it('should throw error if the action is not FSA', () => {
-        expect(() => makeChildOf({a: 'a'})({b: 'b'})).toThrow(FluxStandardActionError);
+    it('should throw error if the action is not a ReduxSagaMateAction', () => {
+        expect(() => makeChildOf({a: 'a'})(undefined)).toThrow(Error);
+        expect(() => makeChildOf({type: 'type'})({a: 'a'})).toThrow(Error);
     });
 
     it('should set pid of the action with the id of parent', () => {
         expect(makeChildOf(parent)(child).meta.pid).toBe(parent.meta.id);
-    });
-});
-
-describe('makeActionAsync', () => {
-    const action = {
-        type: 'type',
-        payload: 'payload',
-    };
-
-    const desired = {
-        type: 'type',
-        payload: 'payload',
-        meta: {
-            id: idOfAction(action),
-            pid: undefined,
-            ctime: expect.stringMatching(REGEX_ISO8601),
-            phase: PHASE_STARTED,
-            progress: 0,
-        },
-    };
-
-    it('should throw error if the action is not FSA', () => {
-        expect(() => makeActionAsync({a: 'a'})).toThrow(FluxStandardActionError);
-    });
-
-    it('should fill meta with start signal', () => {
-        expect(makeActionAsync(action)).toMatchObject(desired);
     });
 });
 

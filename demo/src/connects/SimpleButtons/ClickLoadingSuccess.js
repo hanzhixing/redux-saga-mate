@@ -1,9 +1,7 @@
 import {connect} from 'react-redux';
-import {get} from 'lodash/fp';
-import {compose, lifecycle, withState, withProps} from 'recompose';
+import {compose, get} from 'lodash/fp';
 import {createSelector} from 'reselect';
 import {createAsyncAction, idOfAction, createSelectActions, withAsyncActionStateHandler} from 'redux-saga-mate';
-import {delay} from '../../utils';
 import * as ActionTypes from '../../actions/types';
 import ClickLoadingSuccess from '../../components/SimpleButtons/ClickLoadingSuccess';
 
@@ -22,15 +20,15 @@ const makeMapStateToProps = () => createSelector(
     }),
 );
 
-const mapDispatchToProps = (dispatch, props) => ({
+const mapDispatchToProps = (dispatch, {setActionId, unsetActionId}) => ({
     onClick: () => {
-        const actionId = idOfAction(dispatch(
-            createAsyncAction(ActionTypes.ASYNC_NOOP)({to: 'success'})
-        ));
-        props.setActionId('onClick', actionId);
+        const action = dispatch(
+            createAsyncAction(ActionTypes.ASYNC_NOOP)({to: 'success'}),
+        );
+        setActionId('onClick', idOfAction(action));
     },
     onReset: () => {
-        props.unsetActionId('onClick');
+        unsetActionId('onClick');
     },
 });
 

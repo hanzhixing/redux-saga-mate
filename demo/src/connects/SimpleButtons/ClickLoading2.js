@@ -3,7 +3,6 @@ import {get} from 'lodash/fp';
 import {compose} from 'recompose';
 import {createSelector} from 'reselect';
 import {createAsyncAction, idOfAction, createSelectActions, withAsyncActionStateHandler} from 'redux-saga-mate';
-import {delay} from '../../utils';
 import * as ActionTypes from '../../actions/types';
 import ClickLoading from '../../components/SimpleButtons/ClickLoading';
 
@@ -14,8 +13,7 @@ export const selectActions = () => createSelectActions(
 
 const makeMapStateToProps = () => createSelector(
     selectActions(),
-    (state, props) => props.actionIds,
-    (actions, actionIds) => ({
+    actions => ({
         id: 2,
         loading: get(['onClick', 'isLoading'], actions),
     }),

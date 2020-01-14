@@ -8,18 +8,17 @@ const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const safePostCssParser = require('postcss-safe-parser');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
-
-const homepage = require(path.resolve(__dirname, 'package.json')).homepage;
+const {homepage} = require('./package.json');
 
 const ensureSlash = (path, need) => {
     const hasSlash = path.endsWith('/');
     if (hasSlash && !need) {
         return path.slice(0, -1);
-    } else if (!hasSlash && need) {
-        return `${path}/`;
-    } else {
-        return path;
     }
+    if (!hasSlash && need) {
+        return `${path}/`;
+    }
+    return path;
 };
 
 module.exports = (cliEnv = {}, argv) => {
@@ -84,7 +83,15 @@ module.exports = (cliEnv = {}, argv) => {
         mode: isProd ? 'production' : isDev && 'development',
         // Stop compilation early in production
         bail: isProd,
-        devtool: isProd ? 'source-map' : (isDev ? 'cheap-module-source-map' : false),
+        devtool: (() => {
+            if (isProd) {
+                return 'source-map';
+            }
+            if (isDev) {
+                return 'cheap-module-source-map';
+            }
+            return false;
+        })(),
         devServer: {
             disableHostCheck: true,
             compress: true,
@@ -113,14 +120,20 @@ module.exports = (cliEnv = {}, argv) => {
             pathinfo: isDev,
             filename: `static/js/[name]${isProd ? '.[chunkhash]' : isDev && ''}.js`,
             chunkFilename: `static/js/[name]${isProd ? '.[chunkhash]' : isDev && ''}.chunk.js`,
-            publicPath: publicPath,
-            devtoolModuleFilenameTemplate: isProd
-                ? info =>
-                path
-                .relative(path.resolve(__dirname, 'demo/src'), info.absoluteResourcePath)
-                .replace(/\\/g, '/')
-                : isDev &&
-                (info => path.resolve(info.absoluteResourcePath).replace(/\\/g, '/')),
+            publicPath,
+            devtoolModuleFilenameTemplate: (() => {
+                if (isProd) {
+                    return info => path.relative(
+                        path.resolve(__dirname, 'demo/src'), info.absoluteResourcePath
+                    ).replace(/\\/g, '/');
+                }
+
+                if (isDev) {
+                    return info => path.resolve(info.absoluteResourcePath).replace(/\\/g, '/');
+                }
+
+                return undefined;
+            })(),
         },
         optimization: {
             minimize: isProd,
@@ -152,7 +165,7 @@ module.exports = (cliEnv = {}, argv) => {
                 new OptimizeCSSAssetsPlugin({
                     cssProcessorOptions: {
                         parser: safePostCssParser,
-                        map: true ? {inline: false, annotation: true} : false,
+                        map: isProd ? {inline: false, annotation: true} : false,
                     },
                 }),
             ],
@@ -165,10 +178,12 @@ module.exports = (cliEnv = {}, argv) => {
         resolve: {
             alias: {
                 // This is the patch which removes the warning below in the browser console.
-                // Warning! React-Hot-Loader: react-hot-dom patch is not detected. React 16.6+ features may not work.
-
+                // Warning! React-Hot-Loader: react-hot-dom patch is not detected.
+                // React 16.6+ features may not work.
                 'react-dom': '@hot-loader/react-dom',
                 'redux-saga-mate': path.resolve(__dirname, 'src/index'),
+                // 'redux-saga-mate': path.resolve(__dirname, 'dist/esm/index'),
+                // 'redux-saga-mate': path.resolve(__dirname, 'dist/cjs/index'),
             },
             extensions: ['.wasm', '.mjs', '.js', '.json', '.jsx'],
         },
@@ -178,40 +193,33 @@ module.exports = (cliEnv = {}, argv) => {
                 {
                     enforce: 'pre',
                     test: /\.(js|mjs|jsx)$/,
-                    loader: "eslint-loader",
+                    loader: 'eslint-loader',
                     include: [
-                        path.resolve(__dirname),
+                        path.resolve(__dirname, 'src'),
                         path.resolve(__dirname, 'demo/src'),
                     ],
                     exclude: /node_modules/,
                 },
                 {
                     oneOf: [
-                        // {
-                        //     test: /\.svg$/,
-                        //     loader: 'svg-inline-loader'
-                        // },
                         {
                             test: /\.svg$/,
+                            include: [
+                                path.resolve(__dirname, 'demo/src'),
+                            ],
                             use: {
                                 loader: 'svg-react-loader',
                             },
                         },
                         {
-                            test: /\.(bmp|gif|jpe?g|png)$/,
-                            // loader: 'url-loader',
+                            test: /\.(bmp|gif|jpe?g|png|eot|otf|svg|ttf|woff)$/,
                             loader: 'file-loader',
                             options: {
-                                limit: 10000,
                                 name: 'static/media/[name].[hash:8].[ext]',
                             },
                         },
                         {
-                            test: /\.(js|mjs|jsx)$/,
-                            include: [
-                                path.resolve(__dirname),
-                                path.resolve(__dirname, 'demo/src'),
-                            ],
+                            test: /\.m?jsx?$/,
                             loader: 'babel-loader',
                             options: {
                                 cacheDirectory: true,
@@ -220,7 +228,6 @@ module.exports = (cliEnv = {}, argv) => {
                         },
                         {
                             test: /\.css$/,
-                            exclude: /\.m\.css$/,
                             use: getStyleLoaders({
                                 importLoaders: 1,
                                 sourceMap: isProd && true,
@@ -228,18 +235,7 @@ module.exports = (cliEnv = {}, argv) => {
                             sideEffects: true,
                         },
                         {
-                            test: /\.m\.css$/,
-                            use: getStyleLoaders({
-                                importLoaders: 1,
-                                sourceMap: isProd &&  true,
-                                modules: {
-                                    localIdentName: '[path][name]__[local]--[hash:base64:5]',
-                                },
-                            }),
-                        },
-                        {
                             test: /\.scss$/,
-                            exclude: /\.m\.scss$/,
                             use: getStyleLoaders(
                                 {
                                     importLoaders: 2,
@@ -261,27 +257,6 @@ module.exports = (cliEnv = {}, argv) => {
                                 },
                                 'sass-loader'
                             ),
-                        },
-                        {
-                            loader: 'file-loader',
-                            exclude: [/\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/],
-                            options: {
-                                name: 'static/media/[name].[hash:8].[ext]',
-                            },
-                        },
-                        {
-                            test: /\.html$/,
-                            use: [
-                                {
-                                    loader: 'html-loader',
-                                    options: {
-                                        interpolate: true,
-                                        minimize: false,
-                                        removeComments: false,
-                                        collapseWhitespace: false
-                                    },
-                                },
-                            ],
                         },
                         // ** STOP ** Are you adding a new loader?
                         // Make sure to add the new loader(s) before the "file" loader.

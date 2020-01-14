@@ -34,7 +34,7 @@ const mapDispatchToProps = (dispatch, props) => ({
 const withRedux = connect(makeMapStateToProps, mapDispatchToProps);
 
 const maybeBufferLoading = branch(
-    ({items, buffer, onPageTransient}) => (
+    ({items, onPageTransient}) => (
         items && onPageTransient && onPageTransient.isLoading
     ),
     renderComponent(LoadingBuffer),
@@ -58,5 +58,5 @@ export default compose(
     withAsyncActionContextConsumer,
     withProps(mapAsyncActionProps),
     withRedux,
-    maybeNotBuffer
+    maybeNotBuffer,
 )(Buffer);

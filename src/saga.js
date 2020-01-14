@@ -7,38 +7,36 @@ import {idOfAction, isFinished, failWith, succeedWith} from './action';
 export const makeCreateDefaultWorker = (
     [ErrorType, CleanupActionType],
     {autoclear: autoclearByWorkerMaker} = {},
-) => (
-    (method, payload, {autoclear: autoClearByWorker} = {}) => {
-        return function* defaultWorkerSaga(action) {
-            try {
-                if (isFinished(action)) {
-                    return;
-                }
-
-                const state = yield select();
-
-                const json = yield call(method, (payload ? payload(state, action) : action.payload));
-
-                yield put(succeedWith(json)(action));
-
-                if (autoClearByWorker === true) {
-                    yield put(createAction(CleanupActionType)(idOfAction(action)));
-                    return;
-                }
-                if (autoClearByWorker === false) {
-                    return;
-                }
-                if (autoclearByWorkerMaker === true) {
-                    yield put(createAction(CleanupActionType)(idOfAction(action)));
-                    return;
-                }
-            } catch (error) {
-                if (error instanceof ErrorType) {
-                    yield put(failWith(error)(action));
-                    return;
-                }
-                throw error;
+) => (method, payload, {autoclear: autoClearByWorker} = {}) => (
+    function* defaultWorkerSaga(action) {
+        try {
+            if (isFinished(action)) {
+                return;
             }
-        };
+
+            const state = yield select();
+
+            const json = yield call(method, (payload ? payload(state, action) : action.payload));
+
+            yield put(succeedWith(json)(action));
+
+            if (autoClearByWorker === true) {
+                yield put(createAction(CleanupActionType)(idOfAction(action)));
+                return;
+            }
+            if (autoClearByWorker === false) {
+                return;
+            }
+            if (autoclearByWorkerMaker === true) {
+                yield put(createAction(CleanupActionType)(idOfAction(action)));
+                return;
+            }
+        } catch (error) {
+            if (error instanceof ErrorType) {
+                yield put(failWith(error)(action));
+                return;
+            }
+            throw error;
+        }
     }
 );

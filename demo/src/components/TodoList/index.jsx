@@ -5,7 +5,7 @@ import MaybeBuffer from '../../connects/TodoList/MaybeBuffer';
 import {e2e} from '../../utils';
 import cx from './index.m.scss';
 
-export default ({
+const TodoList = ({
     page,
     modalTodoAuthor,
     modalAuthorInfo,
@@ -51,6 +51,10 @@ export default ({
             <br />
         </div>
         <Pager page={page} />
-        {!!modalTodoAuthor && (<AuthorModal {...modalAuthorInfo} onCloseAuthorModal={onCloseAuthorModal} />)}
+        {!!modalTodoAuthor && (
+            <AuthorModal {...modalAuthorInfo} onCloseAuthorModal={onCloseAuthorModal} />
+        )}
     </div>
 );
+
+export default TodoList;

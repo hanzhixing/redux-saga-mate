@@ -1,17 +1,14 @@
-import cx from './index.m.scss';
-
-export default ({loading, error, clicked, onClick, onReset}) => (
+const ClickLoadingSuccess = ({loading, error, clicked, onClick, onReset}) => (
     <button
         type="button"
         onClick={clicked ? onReset : onClick}
         disabled={loading === true}
-        className={cx(
+        className={[
             'btn',
-            {
-                'btn-primary': loading === true || !clicked,
-                'btn-success': clicked && loading === undefined,
-            }
-        )}
+            (loading === true || !clicked) ? 'btn-primary' : '',
+            (clicked && loading === undefined) ? 'btn-success' : '',
+
+        ].join(' ')}
     >
         {
             loading === true && (
@@ -23,3 +20,5 @@ export default ({loading, error, clicked, onClick, onReset}) => (
         {clicked && !error && !loading && 'Success! Click again to reset'}
     </button>
 );
+
+export default ClickLoadingSuccess;

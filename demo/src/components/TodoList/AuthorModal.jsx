@@ -17,7 +17,7 @@ export default ({isLoading, name, onCloseAuthorModal}) => (
                 textAlign: 'center',
                 margin: '30px auto',
                 paddingTop: '30px',
-            }
+            },
         }}
     >
         {

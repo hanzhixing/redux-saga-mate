@@ -6,10 +6,10 @@ export const selectTodoIds = (state, props) => get(['ui', 'todos', props.page, '
 export const selectBufferTodoIds = (state, props) => get(['ui', 'todos', props.page, 'buffer'], state);
 export const selectModalTodo = (state, props) => get([props.modalTodoAuthor], state.entities.todos);
 
-export const selectUsers = (state, props) => state.entities.users;
+export const selectUsers = state => state.entities.users;
 
 export const selectTodos = createSelector(
-    (state, props) => state.entities.todos,
+    state => state.entities.todos,
     selectTodoIds,
     selectUsers,
     (todos, ids, users) => {
@@ -65,7 +65,7 @@ export const selectTransientOfOnPage = createSelector(
             return undefined;
         }
         return actions.onPage[page];
-    }
+    },
 );
 
 export const selectTransientOfOnStar = createSelector(
@@ -75,5 +75,5 @@ export const selectTransientOfOnStar = createSelector(
             return undefined;
         }
         return actions.onStar;
-    }
+    },
 );

@@ -139,14 +139,14 @@ src/
         utime: ISO8601,
         phase: 'started'|'running'|'finished',
         progress: integer between 1~100
-
+        uniq: true or false,
     }
 }
 ```
 
 ### Normalized payloads
 
-You must normalized your api data in the API layer, then it can be processed automatically.
+Recommend normalized your api data in the API layer.
 
 ```js
 {
@@ -205,12 +205,25 @@ const EntityActionMap = {
     // add your mapping rules instead of writing reducers
 };
 
+const locators = {
+    // define possible paths to entities in your action payload
+    UPDATE: [
+        ['response', 'entities'],
+        ['entities'],
+        ['entities'],
+    ],
+    // paths to primaryKey in your action payload, which will be used to delete the entity
+    DELETE: [
+        ['request', 'params', 'id'],
+    ],
+};
+
 export default combineReducers({
     // tuple [ACTION_TYPE_FOR_CLEANUP, YOUR_ASYNC_ACTION_TYPE_REGEX]
     actions: createActionsReducer([ActionTypes.CLEANUP, /^ASYNC_/]),
     entities: combineReducers(
         groupByComposeByEntityType(
-            createEntitiesReducer(EntityActionMap),
+            createEntitiesReducer(locators, EntityActionMap),
             {
                ...
                /// put your own legacy reducers here, they will executed at the end of reducing
@@ -220,7 +233,7 @@ export default combineReducers({
     ),
     ...
     // If you are creating new app, codes above can be written like bellow
-    entities: combineReducers(createEntitiesReducer(EntityActionMap)),
+    entities: combineReducers(createEntitiesReducer(locators, EntityActionMap)),
     ...
 });
 ```
@@ -312,17 +325,17 @@ const makeMapStateToProps = () => {
 #### mapDispatchToProps
 
 ```js
-const mapDispatchToProps = (dispatch, props) => ({
+const mapDispatchToProps = (dispatch, {onTrackAsyncAction}) => ({
     onPage: page => {
         // 1. Make your action Async with 'createAsyncAction'.
         // 2. dispatch it.
         // 3. take the action id with 'idOfAction'
-        const actionId = idOfAction(dispatch(createAsyncAction(ActionTypes.ASYNC_GET_MANY_POST)({
+        const action = dispatch(createAsyncAction(ActionTypes.ASYNC_GET_MANY_POST)({
             page,
-        })));
+        }));
         // you can pass single string, or path in array form for the first argument
         // Seconds is the Action Id.
-        props.onTrackAsyncAction(['onPage', page], actionId);
+        onTrackAsyncAction(['onPage', page], idOfAction(action));
     },
 });
 

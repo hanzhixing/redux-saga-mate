@@ -1,11 +1,9 @@
-import cx from './index.m.scss';
-
-export default ({id, loading, onClick}) => (
+const ClickLoading = ({id, loading, onClick}) => (
     <button
         type="button"
         onClick={onClick}
         disabled={loading === true}
-        className={cx('btn', 'btn-primary')}
+        className="btn btn-primary"
     >
         {`[ ${id} ] `}
         {loading && (
@@ -14,3 +12,5 @@ export default ({id, loading, onClick}) => (
         {loading ? ' Loading...' : 'Click to Loading'}
     </button>
 );
+
+export default ClickLoading;

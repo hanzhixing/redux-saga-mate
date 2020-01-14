@@ -1,5 +1,6 @@
 /* global document */
 import 'bootstrap';
+import 'open-iconic/font/css/open-iconic-bootstrap.min.css';
 
 import {render} from 'react-dom';
 import {Provider} from 'react-redux';
@@ -9,8 +10,7 @@ import fixpath from './fixpath';
 import store from './store';
 import App from './components/App';
 
-import 'open-iconic/font/css/open-iconic-bootstrap.css'
-import './index.scss';
+import './index.m.scss';
 
 fixpath();
 
@@ -26,5 +26,5 @@ render(
             <App />
         </Router>
     </Provider>,
-    root
+    root,
 );

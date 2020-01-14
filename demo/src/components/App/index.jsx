@@ -15,11 +15,11 @@ const SimpleButtons = loadable(() => import(
 
 const navs = [
     {
-        to: `/simple-buttons`,
+        to: '/simple-buttons',
         text: 'Simple Buttons',
     },
     {
-        to: `/todo-list`,
+        to: '/todo-list',
         text: 'Todo List',
     },
 ];

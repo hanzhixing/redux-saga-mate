@@ -29,21 +29,26 @@ const makeMapStateToProps = () => {
     return (state, props) => selectProps(state, props);
 };
 
-const mapDispatchToProps = (dispatch, props) => ({
+const mapDispatchToProps = (dispatch, {
+    onTrackAsyncAction,
+    onViewAuthor,
+    onUntrackAsyncAction,
+    actionIds,
+}) => ({
     onStar: id => {
-        const actionId = idOfAction(dispatch(createAsyncAction(ActionTypes.ASYNC_PATCH_ONE_TODO)({id})));
-        props.onTrackAsyncAction(['onStar', id], actionId);
+        const action = dispatch(createAsyncAction(ActionTypes.ASYNC_PATCH_ONE_TODO)({id}));
+        onTrackAsyncAction(['onStar', id], idOfAction(action));
     },
     onViewAuthor: id => {
-        const actionId = idOfAction(dispatch(createAsyncAction(ActionTypes.ASYNC_GET_ONE_USER_BY_TODO_ID)({
+        const action = dispatch(createAsyncAction(ActionTypes.ASYNC_GET_ONE_USER_BY_TODO_ID)({
             todoId: id,
-        })));
-        props.onTrackAsyncAction('onViewAuthor', actionId);
-        props.onViewAuthor(id);
+        }));
+        onTrackAsyncAction('onViewAuthor', idOfAction(action));
+        onViewAuthor(id);
     },
     onClearStarLoading: id => {
-        props.onUntrackAsyncAction(['onStar', id]);
-        dispatch(createAction(ActionTypes.CLEANUP)(props.actionIds.onStar[id]));
+        onUntrackAsyncAction(['onStar', id]);
+        dispatch(createAction(ActionTypes.CLEANUP)(actionIds.onStar[id]));
     },
 });
 

@@ -1,9 +1,10 @@
 @import "~bootstrap/scss/bootstrap";
 
-body {
+\:global(body) {
     font-size: 12px;
 }
-.icon {
+
+\:global(.icon) {
     width: 16px;
     height: 16px;
 }

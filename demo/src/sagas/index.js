@@ -4,7 +4,10 @@ import {MyError} from '../api/errors';
 import * as ActionTypes from '../actions/types';
 import * as Api from '../api';
 
-const createDefaultWorker = makeCreateDefaultWorker([MyError, ActionTypes.CLEANUP], {autoclear: true});
+const createDefaultWorker = makeCreateDefaultWorker(
+    [MyError, ActionTypes.CLEANUP],
+    {autoclear: true},
+);
 
 // Notice!
 // If you need more complicated logic controls then the default worker saga,

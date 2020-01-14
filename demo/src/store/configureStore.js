@@ -15,7 +15,7 @@ export default (initialState = undefined, storeName = undefined, LS_KEY = 'REDUX
             || JSON.parse(window.localStorage.getItem(LS_KEY))
             || undefined;
     } catch (e) {
-        console.log('The JSON data in Local Storage seems broken!');
+        console.warn('The JSON data in Local Storage seems broken!');
         preloadedState = undefined;
     }
 
@@ -27,7 +27,7 @@ export default (initialState = undefined, storeName = undefined, LS_KEY = 'REDUX
         rootReducer,
         preloadedState,
         composeEnhancers(applyMiddleware(
-            sagaMiddleware
+            sagaMiddleware,
         )),
     );
 

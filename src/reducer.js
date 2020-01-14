@@ -1,9 +1,9 @@
 import Errio from 'errio';
+import isPlainObject from 'is-plain-object';
 import compose from 'ramda/src/compose';
 import omit from 'ramda/src/omit';
 import mergeDeepWithKey from 'ramda/src/mergeDeepWithKey';
 import mergeDeepRight from 'ramda/src/mergeDeepRight';
-import mergeWith from 'ramda/src/mergeWith';
 import keys from 'ramda/src/keys';
 import reduce from 'ramda/src/reduce';
 import uniq from 'ramda/src/uniq';
@@ -27,11 +27,15 @@ export const createActionsReducer = ([
     DEFAULT_ASYNC_ACTION_TYPE_REGEX,
 ]) => (state = {}, action) => {
     if (action.type === CleanupActionType) {
-        return Array.isArray(action.payload) ? omit(action.payload, state) : omit([action.payload], state);
+        return (
+            Array.isArray(action.payload)
+                ? omit(action.payload, state)
+                : omit([action.payload], state)
+        );
     }
 
-    // there is nothing we can do without `meta.id`
-    if (!action.meta || !action.meta.id) {
+    // there is nothing we can do without correct meta
+    if (!isPlainObject(action.meta) || action.meta.sign !== SIGN || !action.meta.id) {
         return state;
     }
 
@@ -39,7 +43,9 @@ export const createActionsReducer = ([
         return set(
             lensProp(action.meta.id),
             mergeDeepRight(action, {
-                payload: (action.error ? JSON.parse(Errio.stringify(action.payload)) : action.payload),
+                payload: (
+                    action.error ? JSON.parse(Errio.stringify(action.payload)) : action.payload
+                ),
             }),
             state,
         );
@@ -48,34 +54,46 @@ export const createActionsReducer = ([
     return state;
 };
 
-export const createEntityTypeReducer = (entityType, operations) => (state = {}, action) => {
-    if (operations[action.type] && isFinished(action) && !action.error) {
-        const [operation, merger] = (
-            Array.isArray(operations[action.type]) ? operations[action.type] : [operations[action.type]]
-        );
-        if (operation === UPDATE) {
-            const getNewPayload = () => {
-                if (action.payload.response) {
-                    return action.payload.response.entities[entityType] || {};
-                }
-                return action.payload.entities[entityType] || {};
-            };
-            if (merger) {
-                return mergeDeepWithKey(merger, state, getNewPayload());
-            }
-            return mergeDeepRight(state, getNewPayload());
-        }
-        if (operation === DELETE) {
-            return omit([action.payload.request.params.id])(state);
-        }
+export const createEntityTypeReducer = (
+    locators, entityType, operations,
+) => (state = {}, action) => {
+    if (!operations[action.type] || !isFinished(action) || action.error) {
+        return state;
     }
+
+    const [operation, merger] = (
+        Array.isArray(operations[action.type]) ? operations[action.type] : [operations[action.type]]
+    );
+
+    if (!locators[operation]) {
+        return state;
+    }
+
+    const locator = locators[operation].find(a => path(a, action.payload));
+
+    if (!locator) {
+        return state;
+    }
+
+    if (operation === UPDATE) {
+        const merge = merger ? mergeDeepWithKey(merger) : mergeDeepRight;
+
+        return merge(state, path([...locator, entityType], action.payload));
+    }
+
+    if (operation === DELETE) {
+        const pk = path(locator, action.payload);
+
+        return omit(Array.isArray(pk) ? pk : [pk], state);
+    }
+
     return state;
 };
 
-export const createEntitiesReducer = entityActionMap => compose(
+export const createEntitiesReducer = (locators, entityActionMap) => compose(
     reduce((reducers, entityType) => set(
         lensProp(entityType),
-        createEntityTypeReducer(entityType, entityActionMap[entityType]),
+        createEntityTypeReducer(locators, entityType, entityActionMap[entityType]),
         reducers,
     ), {}),
     keys,

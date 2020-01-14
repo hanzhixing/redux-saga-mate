@@ -1,9 +1,9 @@
 import {UPDATE, DELETE} from './operation';
 
 export {
+    isReduxSagaMateAction,
     createAsyncAction,
     createAsyncActionUnique,
-    makeActionAsync,
     idOfAction,
     isFinished,
     continueWith,

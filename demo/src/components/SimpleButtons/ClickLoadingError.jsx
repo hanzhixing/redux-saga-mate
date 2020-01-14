@@ -1,17 +1,9 @@
-import cx from './index.m.scss';
-
-export default ({loading, error, onClick, onReset}) => (
+const ClickLoadingError = ({loading, error, onClick, onReset}) => (
     <button
         type="button"
         onClick={error ? onReset : onClick}
         disabled={loading === true}
-        className={cx(
-            'btn',
-            {
-                'btn-primary': loading !== false,
-                'btn-danger': error,
-            }
-        )}
+        className={`btn ${loading !== false && 'btn-primary'} ${error && 'btn-danger'}`}
     >
         {
             loading === true && (
@@ -23,3 +15,5 @@ export default ({loading, error, onClick, onReset}) => (
         {error && 'Error! Click again to reset'}
     </button>
 );
+
+export default ClickLoadingError;

@@ -1,6 +1,6 @@
 import {repeat} from '../../utils';
 
-export default () => {
+const Loading = () => {
     const rows = [];
 
     const loading = n => (
@@ -23,4 +23,6 @@ export default () => {
     repeat(5)(makeLoading)(1);
 
     return rows;
-}
+};
+
+export default Loading;

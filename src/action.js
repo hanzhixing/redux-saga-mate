@@ -1,19 +1,52 @@
 /* global document */
+import curry from 'ramda/src/curry';
+import isPlainObject from 'is-plain-object';
 import stringify from 'json-stable-stringify';
-import {createAction} from 'redux-actions';
-import {isFSA} from 'flux-standard-action';
-import uuidv5 from 'uuid/v5';
-import {FluxStandardActionError} from './error';
-import {PHASE_GHOST, PHASE_STARTED, PHASE_RUNNING, PHASE_FINISH} from './phase';
+import {v4 as uuidv4, v5 as uuidv5} from 'uuid';
+import {PHASE_STARTED, PHASE_RUNNING, PHASE_FINISH} from './phase';
 import {SIGN} from './sign';
 
 const UUID_NULL = '00000000-0000-0000-0000-000000000000';
 
 const UUID_NAMESPACE = uuidv5(document.domain, UUID_NULL);
 
-export const idOfAction = (action, uniq = false) => {
-    if (!isFSA(action)) {
-        throw new FluxStandardActionError();
+const TOP_LEVEL_KEYS = ['type', 'payload', 'error', 'meta'];
+
+const META_KEYS = ['sign', 'id', 'pid', 'phase', 'progress', 'ctime', 'utime', 'uniq'];
+
+const getInvalidActionMessage = action => (
+    `Invalid ReduxSagaMateAction. ${JSON.stringify(action)}`
+);
+
+export const isReduxSagaMateAction = action => {
+    if (!isPlainObject(action)) {
+        return false;
+    }
+
+    if (typeof action.type !== 'string') {
+        return false;
+    }
+
+    if (!Object.keys(action).every(k => TOP_LEVEL_KEYS.includes(k))) {
+        return false;
+    }
+
+    if (action.meta) {
+        if (!isPlainObject(action.meta)) {
+            return false;
+        }
+
+        if (!Object.keys(action.meta).every(k => META_KEYS.includes(k))) {
+            return false;
+        }
+    }
+
+    return true;
+};
+
+export const idOfAction = curry((action, uniq = false) => {
+    if (!isReduxSagaMateAction(action)) {
+        throw new Error(getInvalidActionMessage(action));
     }
 
     const {type, payload, meta} = action;
@@ -22,14 +55,18 @@ export const idOfAction = (action, uniq = false) => {
         return meta.id;
     }
 
-    const signal = uniq ? [type, payload, Date.now()] : [type, payload];
+    if (uniq) {
+        return uuidv4();
+    }
+
+    const signal = [type, payload];
 
     return uuidv5(stringify(signal), UUID_NAMESPACE);
-};
+});
 
 export const pidOfAction = action => {
-    if (!isFSA(action)) {
-        throw new FluxStandardActionError();
+    if (!isReduxSagaMateAction(action)) {
+        throw new Error(getInvalidActionMessage(action));
     }
 
     const {meta} = action;
@@ -37,26 +74,13 @@ export const pidOfAction = action => {
     return meta ? meta.pid : undefined;
 };
 
-export const makeTrackable = (action, uniq) => {
-    if (!isFSA(action)) {
-        throw new FluxStandardActionError();
+export const trackFor = curry((parent, child) => {
+    if (!isReduxSagaMateAction(parent)) {
+        throw new Error(getInvalidActionMessage(parent));
     }
 
-    return {
-        ...action,
-        meta: {
-            id: idOfAction(action, uniq),
-            pid: undefined,
-            ctime: (new Date()).toISOString(),
-            sign: SIGN,
-            uniq,
-        },
-    };
-};
-
-export const trackFor = parent => child => {
-    if (!isFSA(child) || !isFSA(parent)) {
-        throw new FluxStandardActionError();
+    if (!isReduxSagaMateAction(child)) {
+        throw new Error(getInvalidActionMessage(child));
     }
 
     return {
@@ -67,7 +91,7 @@ export const trackFor = parent => child => {
             ctime: (new Date()).toISOString(),
         },
     };
-};
+});
 
 export const isUnique = action => action.meta.uniq === true;
 export const isStarted = action => action.meta.phase === PHASE_STARTED;
@@ -75,8 +99,8 @@ export const isRunning = action => action.meta.phase === PHASE_RUNNING;
 export const isFinished = action => action.meta.phase === PHASE_FINISH;
 
 export const continueWith = (payload, progress = 0) => action => {
-    if (!isFSA(action)) {
-        throw new FluxStandardActionError();
+    if (!isReduxSagaMateAction(action)) {
+        throw new Error(getInvalidActionMessage(action));
     }
 
     return {
@@ -91,9 +115,9 @@ export const continueWith = (payload, progress = 0) => action => {
     };
 };
 
-export const succeedWith = payload => action => {
-    if (!isFSA(action)) {
-        throw new FluxStandardActionError();
+export const succeedWith = curry((payload, action) => {
+    if (!isReduxSagaMateAction(action)) {
+        throw new Error(getInvalidActionMessage(action));
     }
 
     return {
@@ -106,11 +130,11 @@ export const succeedWith = payload => action => {
             utime: (new Date()).toISOString(),
         },
     };
-};
+});
 
-export const failWith = error => action => {
-    if (!isFSA(action)) {
-        throw new FluxStandardActionError();
+export const failWith = curry((error, action) => {
+    if (!isReduxSagaMateAction(action)) {
+        throw new Error(getInvalidActionMessage(action));
     }
 
     return {
@@ -124,22 +148,31 @@ export const failWith = error => action => {
             utime: (new Date()).toISOString(),
         },
     };
-};
+});
 
-export const isChildOf = parent => child => {
-    if (!isFSA(child) || !isFSA(parent)) {
-        throw new FluxStandardActionError();
+export const isChildOf = curry((parent, child) => {
+    if (!isReduxSagaMateAction(parent)) {
+        throw new Error(getInvalidActionMessage(parent));
+    }
+
+    if (!isReduxSagaMateAction(child)) {
+        throw new Error(getInvalidActionMessage(child));
     }
 
     return (parent.meta.id === child.meta.pid);
-};
+});
 
-export const makeChildOf = parent => child => {
-    if (!isFSA(child) || !isFSA(parent)) {
-        throw new FluxStandardActionError();
+export const makeChildOf = curry((parent, child) => {
+    if (!isReduxSagaMateAction(parent)) {
+        throw new Error(getInvalidActionMessage(parent));
+    }
+
+    if (!isReduxSagaMateAction(child)) {
+        throw new Error(getInvalidActionMessage(child));
     }
 
     const childAction = trackFor(parent)(child);
+
     return {
         ...childAction,
         meta: {
@@ -148,25 +181,31 @@ export const makeChildOf = parent => child => {
             progress: 0,
         },
     };
-};
+});
 
-export const makeActionAsync = (action, uniq) => {
-    if (!isFSA(action)) {
-        throw new FluxStandardActionError();
+export const createTrackableAction = (action, uniq = false) => {
+    if (!isReduxSagaMateAction(action)) {
+        throw new Error(getInvalidActionMessage(action));
     }
 
-    const trackableAction = makeTrackable(action, uniq);
-
     return {
-        ...trackableAction,
+        ...action,
         meta: {
-            ...trackableAction.meta,
+            sign: SIGN,
+            id: idOfAction(action, uniq),
+            pid: undefined,
             phase: PHASE_STARTED,
             progress: 0,
+            ctime: (new Date()).toISOString(),
+            uniq,
         },
     };
 };
 
-export const createAsyncAction = type => payload => makeActionAsync(createAction(type)(payload));
+export const createAsyncAction = curry((type, payload) => (
+    createTrackableAction({type, payload})
+));
 
-export const createAsyncActionUnique = type => payload => makeActionAsync(createAction(type)(payload), true);
+export const createAsyncActionUnique = curry((type, payload) => (
+    createTrackableAction({type, payload}, true)
+));

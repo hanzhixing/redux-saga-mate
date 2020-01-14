@@ -5,7 +5,7 @@ import ClickLoading1 from '../../connects/SimpleButtons/ClickLoading1';
 import ClickLoading2 from '../../connects/SimpleButtons/ClickLoading2';
 import ClickLoading3 from '../../connects/SimpleButtons/ClickLoading3';
 
-export default hot(()=> (
+const SimpleButtons = () => (
     <>
         <div className="row m-3">
             <ClickLoadingSuccess />
@@ -20,7 +20,8 @@ export default hot(()=> (
             So they will share the same loading state.
         </div>
         <div className="row m-3">
-            But [3] will not share the same loading state, even if its type and payload are the same too.
+            But [3] will not share the same loading state,
+            even if its type and payload are the same too.
         </div>
         <div className="row m-3">
             Because we make the action unique:
@@ -36,4 +37,6 @@ export default hot(()=> (
             <ClickLoading3 />
         </div>
     </>
-));
+);
+
+export default hot(SimpleButtons);
