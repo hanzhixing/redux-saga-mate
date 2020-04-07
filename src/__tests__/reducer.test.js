@@ -249,6 +249,20 @@ describe('createEntityTypeReducer should create a reducer which', () => {
         expect(reducer(before, action)).toBe(before);
     });
 
+    it('keep unchanged if the entities for the type from action payload is falsy', () => {
+        const action = {
+            type: 'async_1',
+            payload: {
+                entities: {},
+            },
+            meta: {
+                phase: 'finish',
+            },
+        };
+
+        expect(reducer(before, action)).toBe(before);
+    });
+
     it('update entity with simple merge.', () => {
         const after1 = {
             id1: {

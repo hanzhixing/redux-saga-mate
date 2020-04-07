@@ -78,6 +78,12 @@ export const createEntityTypeReducer = (
     if (operation === UPDATE) {
         const merge = merger ? mergeDeepWithKey(merger) : mergeDeepRight;
 
+        const entities = path([...locator, entityType], action.payload);
+
+        if (!entities) {
+            return state;
+        }
+
         return merge(state, path([...locator, entityType], action.payload));
     }
 
