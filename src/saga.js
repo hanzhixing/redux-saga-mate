@@ -1,4 +1,3 @@
-import {createAction} from 'redux-actions';
 import {call, put, select} from 'redux-saga/effects';
 import {idOfAction, isFinished, failWith, succeedWith} from './action';
 
@@ -21,14 +20,14 @@ export const makeCreateDefaultWorker = (
             yield put(succeedWith(json)(action));
 
             if (autoClearByWorker === true) {
-                yield put(createAction(CleanupActionType)(idOfAction(action)));
+                yield put({type: CleanupActionType, payload: idOfAction(action)});
                 return;
             }
             if (autoClearByWorker === false) {
                 return;
             }
             if (autoclearByWorkerMaker === true) {
-                yield put(createAction(CleanupActionType)(idOfAction(action)));
+                yield put({type: CleanupActionType, payload: idOfAction(action)});
                 return;
             }
         } catch (error) {

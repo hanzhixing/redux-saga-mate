@@ -1,9 +1,6 @@
 import {call, put, select} from 'redux-saga/effects';
-import {createAction} from 'redux-actions';
 import {createAsyncAction, idOfAction, succeedWith, failWith} from '../action';
 import {makeCreateDefaultWorker} from '../saga';
-
-const REGEX_ISO8601 = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 
 // Notice! See below to know how to mock Date.
 // @see https://github.com/facebook/jest/issues/2234
@@ -50,7 +47,7 @@ describe('makeCreateDefaultWorker', () => {
     it([
         'should let the worker dispatch a failed action',
         'if the error matches the specified error type,',
-        'then return.'
+        'then return.',
     ].join(''), () => {
         const createWorker = makeCreateDefaultWorker([SyntaxError, clearType]);
 
@@ -89,7 +86,7 @@ describe('makeCreateDefaultWorker', () => {
         expect(run.next().value).toEqual(select());
         expect(run.next().value).toEqual(call(asyncResolve, action.payload));
         expect(run.next(data).value).toEqual(put(succeedWith(data)(action)));
-        expect(run.next().value).toEqual(put(createAction(clearType)(idOfAction(action))));
+        expect(run.next().value).toEqual(put({type: clearType, payload: idOfAction(action)}));
         expect(run.next().value).toEqual(undefined);
 
         global.Date = theDate;
@@ -113,7 +110,7 @@ describe('makeCreateDefaultWorker', () => {
         expect(run.next().value).toEqual(select());
         expect(run.next().value).toEqual(call(asyncResolve, action.payload));
         expect(run.next(data).value).toEqual(put(succeedWith(data)(action)));
-        expect(run.next().value).toEqual(put(createAction(clearType)(idOfAction(action))));
+        expect(run.next().value).toEqual(put({type: clearType, payload: idOfAction(action)}));
         expect(run.next().value).toEqual(undefined);
 
         global.Date = theDate;
@@ -154,7 +151,7 @@ describe('makeCreateDefaultWorker', () => {
         global.Date = jest.fn(() => now);
 
         const payload = 'any';
-        const worker = createWorker(asyncResolve, (state, action) => payload);
+        const worker = createWorker(asyncResolve, () => payload);
 
         const run = worker(action);
 
