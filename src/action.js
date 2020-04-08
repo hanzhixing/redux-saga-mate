@@ -1,5 +1,4 @@
 /* global document */
-import curry from 'ramda/src/curry';
 import isPlainObject from 'is-plain-object';
 import stringify from 'json-stable-stringify';
 import {v4 as uuidv4, v5 as uuidv5} from 'uuid';
@@ -44,7 +43,7 @@ export const isReduxSagaMateAction = action => {
     return true;
 };
 
-export const idOfAction = curry((action, uniq = false) => {
+export const idOfAction = (action, uniq = false) => {
     if (!isReduxSagaMateAction(action)) {
         throw new Error(getInvalidActionMessage(action));
     }
@@ -62,7 +61,7 @@ export const idOfAction = curry((action, uniq = false) => {
     const signal = [type, payload];
 
     return uuidv5(stringify(signal), UUID_NAMESPACE);
-});
+};
 
 export const pidOfAction = action => {
     if (!isReduxSagaMateAction(action)) {
@@ -74,7 +73,7 @@ export const pidOfAction = action => {
     return meta ? meta.pid : undefined;
 };
 
-export const trackFor = curry((parent, child) => {
+export const trackFor = parent => child => {
     if (!isReduxSagaMateAction(parent)) {
         throw new Error(getInvalidActionMessage(parent));
     }
@@ -91,7 +90,7 @@ export const trackFor = curry((parent, child) => {
             ctime: (new Date()).toISOString(),
         },
     };
-});
+};
 
 export const isUnique = action => action.meta.uniq === true;
 export const isStarted = action => action.meta.phase === PHASE_STARTED;
@@ -115,7 +114,7 @@ export const continueWith = (payload, progress = 0) => action => {
     };
 };
 
-export const succeedWith = curry((payload, action) => {
+export const succeedWith = payload => action => {
     if (!isReduxSagaMateAction(action)) {
         throw new Error(getInvalidActionMessage(action));
     }
@@ -130,9 +129,9 @@ export const succeedWith = curry((payload, action) => {
             utime: (new Date()).toISOString(),
         },
     };
-});
+};
 
-export const failWith = curry((error, action) => {
+export const failWith = error => action => {
     if (!isReduxSagaMateAction(action)) {
         throw new Error(getInvalidActionMessage(action));
     }
@@ -148,9 +147,9 @@ export const failWith = curry((error, action) => {
             utime: (new Date()).toISOString(),
         },
     };
-});
+};
 
-export const isChildOf = curry((parent, child) => {
+export const isChildOf = parent => child => {
     if (!isReduxSagaMateAction(parent)) {
         throw new Error(getInvalidActionMessage(parent));
     }
@@ -160,9 +159,9 @@ export const isChildOf = curry((parent, child) => {
     }
 
     return (parent.meta.id === child.meta.pid);
-});
+};
 
-export const makeChildOf = curry((parent, child) => {
+export const makeChildOf = parent => child => {
     if (!isReduxSagaMateAction(parent)) {
         throw new Error(getInvalidActionMessage(parent));
     }
@@ -181,7 +180,7 @@ export const makeChildOf = curry((parent, child) => {
             progress: 0,
         },
     };
-});
+};
 
 export const createTrackableAction = (action, uniq = false) => {
     if (!isReduxSagaMateAction(action)) {
@@ -202,10 +201,10 @@ export const createTrackableAction = (action, uniq = false) => {
     };
 };
 
-export const createAsyncAction = curry((type, payload) => (
+export const createAsyncAction = type => payload => (
     createTrackableAction({type, payload})
-));
+);
 
-export const createAsyncActionUnique = curry((type, payload) => (
+export const createAsyncActionUnique = type => payload => (
     createTrackableAction({type, payload}, true)
-));
+);
