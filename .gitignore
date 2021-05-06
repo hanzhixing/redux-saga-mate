@@ -12,6 +12,7 @@ node_modules
 /dist
 
 # misc
+.log
 .DS_Store
 .tern-port
 .env.local
