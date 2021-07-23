@@ -5,6 +5,7 @@ import {
     pidOfAction,
     createTrackableAction,
     trackFor,
+    isAsync,
     isUnique,
     isStarted,
     isRunning,
@@ -168,7 +169,7 @@ describe('createTrackableAction', () => {
         payload: 'payload',
     };
 
-    const desired = {
+    const desired1 = {
         type: 'type',
         payload: 'payload',
         meta: {
@@ -183,12 +184,25 @@ describe('createTrackableAction', () => {
     });
 
     it('should fill meta with correct properties', () => {
-        expect(createTrackableAction(action)).toMatchObject(desired);
+        expect(createTrackableAction(action)).toMatchObject(desired1);
     });
 
     it('should generates a ctime before now at most in 1 second', () => {
         expect(Date.parse(createTrackableAction(action).meta.ctime))
             .toBeGreaterThanOrEqual(Date.now() - 1000);
+    });
+
+    const desired2 = {
+        type: 'type',
+        payload: 'payload',
+        meta: {
+            id: idOfAction(action),
+            async: true,
+        },
+    }
+
+    it('should fill correct async meta with async option', () => {
+        expect(createTrackableAction(action, {async: true})).toMatchObject(desired2);
     });
 });
 
@@ -212,6 +226,19 @@ describe('trackFor', () => {
 
     it('should attach id of the parent to the child', () => {
         expect(trackFor(parent)(child).meta.pid).toBe(enhancedParent.meta.id);
+    });
+});
+
+describe('isAsync', () => {
+    const action = {
+        type: 'type',
+        payload: 'payload',
+    };
+
+    const enhanced = createAsyncAction(action.type)(action.payload);
+
+    it('should be TRUE if the action is async', () => {
+        expect(isAsync(enhanced)).toBe(true);
     });
 });
 

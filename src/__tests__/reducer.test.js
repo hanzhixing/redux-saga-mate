@@ -1,6 +1,5 @@
-import Errio from 'errio';
 import {SIGN} from '../sign';
-import {UPDATE, DELETE} from '../operation';
+import {UPDATE, REPLACE, DELETE} from '../operation';
 import {
     createActionsReducer,
     createEntityTypeReducer,
@@ -15,7 +14,15 @@ describe('createActionsReducer should create a reducer which', () => {
         expect(maker).toHaveReturned();
     });
 
-    const reducer = createActionsReducer(['clear', /^async_/]);
+    const shouldCleanup = ({type}) => (type === 'clear');
+    const shouldTrack = ({type}) => (type.startsWith('async'));
+    const parseError = () => 'haha';
+
+    const reducer = createActionsReducer({
+        shouldCleanup,
+        shouldTrack,
+        parseError,
+    });
 
     it('can initialize.', () => {
         expect(reducer(undefined, {type: 'other'})).toEqual({});
@@ -113,7 +120,7 @@ describe('createActionsReducer should create a reducer which', () => {
         expect(reducer(before, action)).toEqual(after);
     });
 
-    it('turn error payload to human friendly', () => {
+    it('parse error with the function provided', () => {
         const error = new Error('error');
 
         const before = {
@@ -129,7 +136,7 @@ describe('createActionsReducer should create a reducer which', () => {
             x: {
                 type: 'async_one',
                 error: true,
-                payload: JSON.parse(Errio.stringify(error)),
+                payload: 'haha',
                 meta: {
                     sign: SIGN,
                     id: 'x',
@@ -156,6 +163,9 @@ describe('createEntityTypeReducer should create a reducer which', () => {
         UPDATE: [
             ['entities'],
         ],
+        REPLACE: [
+            ['entities'],
+        ],
         DELETE: [
             ['delete'],
         ],
@@ -170,22 +180,23 @@ describe('createEntityTypeReducer should create a reducer which', () => {
     const EntityActionMap = {
         foo: {
             async_1: UPDATE,
-            async_2: [
-                UPDATE,
-                (k, l, r) => {
-                    if (k !== 'list') {
-                        return r;
-                    }
-
-                    const diff = r.filter(v => !l.includes(v));
-
-                    return [...l, ...diff];
+            async_2: () => ({
+                id1: {
+                    x: 'x',
                 },
-            ],
+                id2: {
+                    y: 'y',
+                    list: [1, 2, 3, 4],
+                },
+                id3: {
+                    z: 'z',
+                },
+            }),
             async_3: DELETE,
             async_4: 'other',
             async_5: 'no locator',
             async_6: 'nothing',
+            async_7: REPLACE,
         },
     };
 
@@ -212,8 +223,8 @@ describe('createEntityTypeReducer should create a reducer which', () => {
         expect(reducer(before, {type: 'foo'})).toBe(before);
     });
 
-    it('keep unchanged if the action is not finished yet.', () => {
-        expect(reducer(before, {type: 'async_1', meta: {phase: 'any'}})).toBe(before);
+    it('keep unchanged if the async action is not finished yet.', () => {
+        expect(reducer(before, {type: 'async_1', meta: {phase: 'any', async: true}})).toBe(before);
     });
 
     it('keep unchanged if the action is finished with error.', () => {
@@ -229,6 +240,7 @@ describe('createEntityTypeReducer should create a reducer which', () => {
             },
             meta: {
                 phase: 'finish',
+                async: true,
             },
         };
 
@@ -243,6 +255,7 @@ describe('createEntityTypeReducer should create a reducer which', () => {
             },
             meta: {
                 phase: 'finish',
+                async: true,
             },
         };
 
@@ -257,10 +270,66 @@ describe('createEntityTypeReducer should create a reducer which', () => {
             },
             meta: {
                 phase: 'finish',
+                async: true,
             },
         };
 
         expect(reducer(before, action)).toBe(before);
+    });
+
+    it('replace entity by the primary key in the action payload', () => {
+        const after1 = {
+            id1: {
+                x: 'X',
+            },
+        };
+
+        const action1 = {
+            type: 'async_7',
+            payload: {
+                entities: {
+                    foo: {
+                        id1: {
+                            x: 'X',
+                        },
+                    },
+                },
+            },
+            meta: {
+                phase: 'finish',
+                async: true,
+            },
+        };
+        expect(reducer(before, action1)).toEqual(after1);
+    });
+
+    it('update entity even if the action is plain FSA', () => {
+        const after1 = {
+            id1: {
+                x: 'x,x',
+            },
+            id2: {
+                y: 'y',
+                list: [1, 2],
+            },
+            id3: {
+                z: 'z',
+            },
+        };
+
+        const action1 = {
+            type: 'async_1',
+            payload: {
+                entities: {
+                    foo: {
+                        id1: {
+                            x: 'x,x',
+                        },
+                    },
+                },
+            },
+        };
+        expect(reducer(before, action1)).toEqual(after1);
     });
 
     it('update entity with simple merge.', () => {
@@ -290,12 +359,13 @@ describe('createEntityTypeReducer should create a reducer which', () => {
             },
             meta: {
                 phase: 'finish',
+                async: true,
             },
         };
         expect(reducer(before, action1)).toEqual(after1);
     });
 
-    it('update entity with custom merge if the merger function is provided.', () => {
+    it('update entity with the return value of the function if an function is provided.', () => {
         const after2 = {
             id1: {
                 x: 'x',
@@ -322,6 +392,7 @@ describe('createEntityTypeReducer should create a reducer which', () => {
             },
             meta: {
                 phase: 'finish',
+                async: true,
             },
         };
 
@@ -347,6 +418,7 @@ describe('createEntityTypeReducer should create a reducer which', () => {
             },
             meta: {
                 phase: 'finish',
+                async: true,
             },
         };
 
@@ -367,20 +439,24 @@ describe('createEntityTypeReducer should create a reducer which', () => {
             },
             meta: {
                 phase: 'finish',
+                async: true,
             },
         };
 
         expect(reducer(before, action)).toEqual(after);
     });
 
-    it('keep unchanged if the operation is not UPDATE nor DELETE.', () => {
+    it('keep unchanged if the operation is not UPDATE, REPLACE or DELETE.', () => {
         const action = {
             type: 'async_6',
             payload: {
-                delete: 'id2',
+                delete: {
+                    foo: 'id2',
+                },
             },
             meta: {
                 phase: 'finish',
+                async: true,
             },
         };
 

@@ -1,9 +1,6 @@
 import {createElement, createContext} from 'react';
-import {compose, withProps, withStateHandlers, wrapDisplayName} from 'recompose';
-import identity from 'ramda/src/identity';
-import set from 'ramda/src/set';
-import lensPath from 'ramda/src/lensPath';
-import dissocPath from 'ramda/src/dissocPath';
+import {compose, identity, set, lensPath, dissocPath} from 'ramda';
+import {withProps, withStateHandlers, wrapDisplayName} from 'recompose';
 
 const withStates = withStateHandlers(
     () => ({actionIds: {}}),

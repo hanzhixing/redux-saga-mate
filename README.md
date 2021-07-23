@@ -36,10 +36,9 @@ Allow you building react and redux based web apps with less pain, by removing th
  ------------------------------
 ```
 
-* `dispatch`, `action`, `reducer`, `store` are concepts from the design of redux, you should never try to put these things in your UI layer.
 * `action`s are about what happend, it's not about "what should be done", even if they were named in verbs.
-* It is `reducer`s' job, that about "what should be done" and "how it should be done".
-* The `container` files you put in the "containers" directory are not actual `container`s, they are just connecting logics, the actual `container`s created automatically by `connect(YourComponent)`, you can only see them in the browser's `Developer Tools`.
+* It is `reducer`'s job, that about "what should be done" and "how it should be done".
+* The `container` files you put in the "containers" directory are not actual `container`s, they are just connecting logics, actual `container`s are created automatically by `connect(YourComponent)`, you can only see them in the browser's `Developer Tools`.
 * In most situations, you should try hard to prevent putting JSX codes in the `container` files. Because they are about the UI.
 * `redux-thunk` changes the origin conceptual model of the `action`, by functions, and functions always about "what should be done", or "how it should be done".
 * The `action` is not equal to action types. **`Action Type` + `Action Payload` = `Action Instance`**.

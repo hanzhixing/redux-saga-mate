@@ -1,36 +1,30 @@
-import Errio from 'errio';
-import isPlainObject from 'is-plain-object';
-import compose from 'ramda/src/compose';
-import omit from 'ramda/src/omit';
-import mergeDeepWithKey from 'ramda/src/mergeDeepWithKey';
-import mergeDeepRight from 'ramda/src/mergeDeepRight';
-import keys from 'ramda/src/keys';
-import reduce from 'ramda/src/reduce';
-import uniq from 'ramda/src/uniq';
-import path from 'ramda/src/path';
-import flatten from 'ramda/src/flatten';
-import map from 'ramda/src/map';
-import set from 'ramda/src/set';
-import lensProp from 'ramda/src/lensProp';
-import {isFinished} from './action';
-import {UPDATE, DELETE} from './operation';
+import {isPlainObject} from 'is-plain-object';
+import {
+    compose,
+    always,
+    omit,
+    mergeDeepRight,
+    keys,
+    reduce,
+    uniq,
+    path,
+    flatten,
+    map,
+    set,
+    lensProp,
+} from 'ramda';
+import {isAsync, isFinished} from './action';
+import {UPDATE, REPLACE, DELETE} from './operation';
 import {SIGN} from './sign';
 
-const DEFAULT_CLEANUP_ACTION_TYPE = 'CLEANUP_TRACKABLE_ACTION';
-const DEFAULT_ASYNC_ACTION_TYPE_REGEX = /^(REST|API|LOAD|ASYNC|FETCH|AJAX)_[0-9A-Z_]+$/;
-
-export const createActionsReducer = ([
-    CleanupActionType,
-    AsyncActionTypeRegex,
-] = [
-    DEFAULT_CLEANUP_ACTION_TYPE,
-    DEFAULT_ASYNC_ACTION_TYPE_REGEX,
-]) => (state = {}, action) => {
-    if (action.type === CleanupActionType) {
+export const createActionsReducer = ({
+    shouldCleanup = always(false),
+    shouldTrack = always(false),
+    parseError = always(undefined),
+} = {}) => (state = {}, action) => {
+    if (shouldCleanup(action)) {
         return (
-            Array.isArray(action.payload)
-                ? omit(action.payload, state)
-                : omit([action.payload], state)
+            Array.isArray(action.payload) ? omit(action.payload, state) : omit([action.payload], state)
         );
     }
 
@@ -39,12 +33,12 @@ export const createActionsReducer = ([
         return state;
     }
 
-    if (AsyncActionTypeRegex.test(action.type)) {
+    if (shouldTrack(action)) {
         return set(
             lensProp(action.meta.id),
             mergeDeepRight(action, {
                 payload: (
-                    action.error ? JSON.parse(Errio.stringify(action.payload)) : action.payload
+                    action.error ? parseError(action.payload) : action.payload
                 ),
             }),
             state,
@@ -57,13 +51,15 @@ export const createActionsReducer = ([
 export const createEntityTypeReducer = (
     locators, entityType, operations,
 ) => (state = {}, action) => {
-    if (!operations[action.type] || !isFinished(action) || action.error) {
+    if (!operations[action.type] || (isAsync(action) && (!isFinished(action) || action.error))) {
         return state;
     }
 
-    const [operation, merger] = (
-        Array.isArray(operations[action.type]) ? operations[action.type] : [operations[action.type]]
-    );
+    const operation = operations[action.type];
+
+    if (typeof operation === 'function') {
+        return operation(state, action);
+    }
 
     if (!locators[operation]) {
         return state;
@@ -75,22 +71,24 @@ export const createEntityTypeReducer = (
         return state;
     }
 
-    if (operation === UPDATE) {
-        const merge = merger ? mergeDeepWithKey(merger) : mergeDeepRight;
-
-        const entities = path([...locator, entityType], action.payload);
-
-        if (!entities) {
-            return state;
-        }
-
-        return merge(state, path([...locator, entityType], action.payload));
-    }
-
     if (operation === DELETE) {
         const pk = path(locator, action.payload);
 
         return omit(Array.isArray(pk) ? pk : [pk], state);
+    }
+
+    const entities = path([...locator, entityType], action.payload);
+
+    if (!entities) {
+        return state;
+    }
+
+    if (operation === REPLACE) {
+        return entities;
+    }
+
+    if (operation === UPDATE) {
+        return mergeDeepRight(state, entities);
     }
 
     return state;

@@ -1,8 +1,5 @@
 import {createSelector} from 'reselect';
-import keys from 'ramda/src/keys';
-import omit from 'ramda/src/omit';
-import set from 'ramda/src/set';
-import lensProp from 'ramda/src/lensProp';
+import {keys, omit, set, lensProp} from 'ramda';
 import {isFinished} from './action';
 
 export const createSelectActions = (selectActions, selectActionIds) => createSelector(

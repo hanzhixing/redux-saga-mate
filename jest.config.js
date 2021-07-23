@@ -1,8 +1,9 @@
 module.exports = {
-    verbose: true,
-    setupFilesAfterEnv: ['jest-extended'],
-    setupFiles: [
+    testEnvironment: "jsdom",
+    setupFilesAfterEnv: [
+        'jest-extended',
         '<rootDir>/node_modules/regenerator-runtime/runtime',
         '<rootDir>/setupFile.js',
     ],
+    verbose: true,
 };
