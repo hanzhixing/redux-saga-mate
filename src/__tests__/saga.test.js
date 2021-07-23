@@ -1,6 +1,9 @@
-import {call, put, select} from 'redux-saga/effects';
-import {createAsyncAction, idOfAction, succeedWith, failWith} from '../action';
-import {makeCreateDefaultWorker} from '../saga';
+import {identity, always} from 'ramda';
+import createSagaMiddleware from 'redux-saga';
+import {createStore, applyMiddleware} from 'redux';
+import {all, call, put, select} from 'redux-saga/effects';
+import {createAsyncAction, idOfAction, isFinished, succeedWith, failWith} from '../action';
+import {makeCreateDefaultWorker, takeLatestDeep} from '../saga';
 
 // Notice! See below to know how to mock Date.
 // @see https://github.com/facebook/jest/issues/2234
@@ -22,7 +25,7 @@ describe('makeCreateDefaultWorker', () => {
     const asyncRejectUnknown = jest.fn(() => Promise.reject(errorUnknown));
 
     it('should let the worker return immediatly if the action is already finished', () => {
-        const createWorker = makeCreateDefaultWorker([SyntaxError, clearType]);
+        const createWorker = makeCreateDefaultWorker();
 
         const worker = createWorker(asyncResolve);
 
@@ -32,8 +35,13 @@ describe('makeCreateDefaultWorker', () => {
         expect(run.next().value).toBe(undefined);
     });
 
-    it('should let the worker throw on the error, if the error is unknown type.', () => {
-        const createWorker = makeCreateDefaultWorker([SyntaxError, clearType]);
+    it('should let the worker throw on the error, if the error should not catch.', () => {
+        const options = {
+            shouldCatch: always(false),
+            cleanupActionType: clearType,
+        };
+
+        const createWorker = makeCreateDefaultWorker(options);
 
         const worker = createWorker(asyncRejectUnknown);
 
@@ -45,14 +53,20 @@ describe('makeCreateDefaultWorker', () => {
     });
 
     it([
-        'should let the worker dispatch a failed action',
+        'should let the worker dispatch a failed action, ',
         'if the error matches the specified error type,',
         'then return.',
     ].join(''), () => {
-        const createWorker = makeCreateDefaultWorker([SyntaxError, clearType]);
+        const options = {
+            shouldCatch: always(true),
+            cleanupActionType: clearType,
+        };
+
+        const createWorker = makeCreateDefaultWorker(options);
 
         const theDate = Date;
         const now = new Date();
+
         global.Date = jest.fn(() => now);
 
         const worker = createWorker(asyncReject);
@@ -73,10 +87,17 @@ describe('makeCreateDefaultWorker', () => {
         'then dispatch cleaup action',
         'if "autoclear" is defined "true" for the creator only',
     ].join(''), () => {
-        const createWorker = makeCreateDefaultWorker([SyntaxError, clearType], {autoclear: true});
+        const options = {
+            shouldCatch: always(false),
+            cleanupActionType: clearType,
+            autoclear: true,
+        };
+
+        const createWorker = makeCreateDefaultWorker(options);
 
         const theDate = Date;
         const now = new Date();
+
         global.Date = jest.fn(() => now);
 
         const worker = createWorker(asyncResolve);
@@ -97,10 +118,17 @@ describe('makeCreateDefaultWorker', () => {
         'then dispatch cleaup action',
         'if "autoclear" is defined "true" for the worker only',
     ].join(''), () => {
-        const createWorker = makeCreateDefaultWorker([SyntaxError, clearType]);
+        const options = {
+            shouldCatch: always(false),
+            cleanupActionType: clearType,
+            autoclear: false,
+        };
+
+        const createWorker = makeCreateDefaultWorker(options);
 
         const theDate = Date;
         const now = new Date();
+
         global.Date = jest.fn(() => now);
 
         const worker = createWorker(asyncResolve, undefined, {autoclear: true});
@@ -122,10 +150,17 @@ describe('makeCreateDefaultWorker', () => {
         'if "autoclear" is defined "false" for the worker, ',
         'but "true" for the worker creator',
     ].join(''), () => {
-        const createWorker = makeCreateDefaultWorker([SyntaxError, clearType], {autoclear: true});
+        const options = {
+            shouldCatch: always(false),
+            cleanupActionType: clearType,
+            autoclear: true,
+        };
+
+        const createWorker = makeCreateDefaultWorker(options);
 
         const theDate = Date;
         const now = new Date();
+
         global.Date = jest.fn(() => now);
 
         const worker = createWorker(asyncResolve, undefined, {autoclear: false});
@@ -144,13 +179,21 @@ describe('makeCreateDefaultWorker', () => {
         'should let the worker dispatch a finished action',
         'with calculated payload if provide a function,',
     ].join(''), () => {
-        const createWorker = makeCreateDefaultWorker([SyntaxError, clearType]);
+        const options = {
+            shouldCatch: always(false),
+            cleanupActionType: clearType,
+            autoclear: false,
+        };
+
+        const createWorker = makeCreateDefaultWorker(options);
 
         const theDate = Date;
         const now = new Date();
+
         global.Date = jest.fn(() => now);
 
         const payload = 'any';
+
         const worker = createWorker(asyncResolve, () => payload);
 
         const run = worker(action);
@@ -161,5 +204,59 @@ describe('makeCreateDefaultWorker', () => {
         expect(run.next().value).toEqual(undefined);
 
         global.Date = theDate;
+    });
+});
+
+describe('takeLatestDeep', () => {
+    let count = 0;
+
+    const asyncCall = jest.fn(() => new Promise(resolve => {
+        const data = String(++count * 100);
+        setTimeout(() => resolve(data), 200);
+    }));
+
+    const racingCall = jest.fn(identity);
+
+    const rootReducer = (state = '', action) => {
+        if (!isFinished(action) || action.error) {
+            return state;
+        }
+        return action.payload;
+    };
+
+    const sagaMiddleware = createSagaMiddleware();
+
+    const store = createStore(rootReducer, undefined, applyMiddleware(sagaMiddleware));
+
+    function* worker(action) {
+        if (isFinished(action)) {
+            return;
+        }
+
+        const result = yield call(asyncCall);
+
+        yield put(succeedWith(racingCall(result))(action));
+    }
+
+    function* rootSaga() {
+        yield all([takeLatestDeep('type', worker)])
+    }
+
+    sagaMiddleware.run(rootSaga);
+
+    it('should take latest only for normal worker saga.', () => {
+        const action1 = createAsyncAction('type')('args');
+        const action2 = createAsyncAction('type')('args');
+
+        store.dispatch(action1);
+        store.dispatch(action2);
+
+        return new Promise(resolve => {
+            setTimeout(() => {
+                expect(racingCall).toHaveBeenCalledTimes(1);
+                expect(store.getState()).toBe('200');
+                resolve();
+            }, 300);
+        })
     });
 });

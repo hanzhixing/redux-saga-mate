@@ -1,5 +1,5 @@
-/* global document */
-import isPlainObject from 'is-plain-object';
+import {pathEq} from 'ramda';
+import {isPlainObject} from 'is-plain-object';
 import stringify from 'json-stable-stringify';
 import {v4 as uuidv4, v5 as uuidv5} from 'uuid';
 import {PHASE_STARTED, PHASE_RUNNING, PHASE_FINISH} from './phase';
@@ -11,9 +11,9 @@ const UUID_NAMESPACE = uuidv5(document.domain, UUID_NULL);
 
 const TOP_LEVEL_KEYS = ['type', 'payload', 'error', 'meta'];
 
-const META_KEYS = ['sign', 'id', 'pid', 'phase', 'progress', 'ctime', 'utime', 'uniq'];
+const META_KEYS = ['sign', 'id', 'pid', 'phase', 'progress', 'ctime', 'utime', 'uniq', 'async'];
 
-const getInvalidActionMessage = action => (
+const generateInvalidActionErrorMessage = action => (
     `Invalid ReduxSagaMateAction. ${JSON.stringify(action)}`
 );
 
@@ -45,7 +45,7 @@ export const isReduxSagaMateAction = action => {
 
 export const idOfAction = (action, uniq = false) => {
     if (!isReduxSagaMateAction(action)) {
-        throw new Error(getInvalidActionMessage(action));
+        throw new Error(generateInvalidActionErrorMessage(action));
     }
 
     const {type, payload, meta} = action;
@@ -65,7 +65,7 @@ export const idOfAction = (action, uniq = false) => {
 
 export const pidOfAction = action => {
     if (!isReduxSagaMateAction(action)) {
-        throw new Error(getInvalidActionMessage(action));
+        throw new Error(generateInvalidActionErrorMessage(action));
     }
 
     const {meta} = action;
@@ -75,11 +75,11 @@ export const pidOfAction = action => {
 
 export const trackFor = parent => child => {
     if (!isReduxSagaMateAction(parent)) {
-        throw new Error(getInvalidActionMessage(parent));
+        throw new Error(generateInvalidActionErrorMessage(parent));
     }
 
     if (!isReduxSagaMateAction(child)) {
-        throw new Error(getInvalidActionMessage(child));
+        throw new Error(generateInvalidActionErrorMessage(child));
     }
 
     return {
@@ -92,14 +92,15 @@ export const trackFor = parent => child => {
     };
 };
 
-export const isUnique = action => action.meta.uniq === true;
-export const isStarted = action => action.meta.phase === PHASE_STARTED;
-export const isRunning = action => action.meta.phase === PHASE_RUNNING;
-export const isFinished = action => action.meta.phase === PHASE_FINISH;
+export const isAsync = pathEq(['meta', 'async'], true);
+export const isUnique = pathEq(['meta', 'uniq'], true);
+export const isStarted = pathEq(['meta', 'phase'], PHASE_STARTED);
+export const isRunning = pathEq(['meta', 'phase'], PHASE_RUNNING);
+export const isFinished = pathEq(['meta', 'phase'], PHASE_FINISH);
 
 export const continueWith = (payload, progress = 0) => action => {
     if (!isReduxSagaMateAction(action)) {
-        throw new Error(getInvalidActionMessage(action));
+        throw new Error(generateInvalidActionErrorMessage(action));
     }
 
     return {
@@ -116,7 +117,7 @@ export const continueWith = (payload, progress = 0) => action => {
 
 export const succeedWith = payload => action => {
     if (!isReduxSagaMateAction(action)) {
-        throw new Error(getInvalidActionMessage(action));
+        throw new Error(generateInvalidActionErrorMessage(action));
     }
 
     return {
@@ -133,7 +134,7 @@ export const succeedWith = payload => action => {
 
 export const failWith = error => action => {
     if (!isReduxSagaMateAction(action)) {
-        throw new Error(getInvalidActionMessage(action));
+        throw new Error(generateInvalidActionErrorMessage(action));
     }
 
     return {
@@ -151,11 +152,11 @@ export const failWith = error => action => {
 
 export const isChildOf = parent => child => {
     if (!isReduxSagaMateAction(parent)) {
-        throw new Error(getInvalidActionMessage(parent));
+        throw new Error(generateInvalidActionErrorMessage(parent));
     }
 
     if (!isReduxSagaMateAction(child)) {
-        throw new Error(getInvalidActionMessage(child));
+        throw new Error(generateInvalidActionErrorMessage(child));
     }
 
     return (parent.meta.id === child.meta.pid);
@@ -163,11 +164,11 @@ export const isChildOf = parent => child => {
 
 export const makeChildOf = parent => child => {
     if (!isReduxSagaMateAction(parent)) {
-        throw new Error(getInvalidActionMessage(parent));
+        throw new Error(generateInvalidActionErrorMessage(parent));
     }
 
     if (!isReduxSagaMateAction(child)) {
-        throw new Error(getInvalidActionMessage(child));
+        throw new Error(generateInvalidActionErrorMessage(child));
     }
 
     const childAction = trackFor(parent)(child);
@@ -182,9 +183,14 @@ export const makeChildOf = parent => child => {
     };
 };
 
-export const createTrackableAction = (action, uniq = false) => {
+const defaultOptions = {
+    uniq: false,
+    async: true,
+};
+
+export const createTrackableAction = (action, {uniq = false, async = true} = defaultOptions) => {
     if (!isReduxSagaMateAction(action)) {
-        throw new Error(getInvalidActionMessage(action));
+        throw new Error(generateInvalidActionErrorMessage(action));
     }
 
     return {
@@ -197,6 +203,7 @@ export const createTrackableAction = (action, uniq = false) => {
             progress: 0,
             ctime: (new Date()).toISOString(),
             uniq,
+            async,
         },
     };
 };
@@ -206,5 +213,5 @@ export const createAsyncAction = type => payload => (
 );
 
 export const createAsyncActionUnique = type => payload => (
-    createTrackableAction({type, payload}, true)
+    createTrackableAction({type, payload}, {uniq: true})
 );

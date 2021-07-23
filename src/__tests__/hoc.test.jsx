@@ -1,112 +1,85 @@
-import {shallow, mount} from 'enzyme';
-import {render} from '@testing-library/react';
+import '@testing-library/jest-dom'
+import React from 'react';
+import {fireEvent, render} from '@testing-library/react';
 import {withAsyncActionStateHandler, createAsyncActionContext} from '../hoc';
 
 describe('withAsyncActionStateHandler', () => {
-    let doSetActionId;
-    let nextActionIds;
-
-    const Base = ({actionIds, setActionId, unsetActionId}) => {
-        const handleClickShallow = () => setActionId('onClickShallow', 'abc');
-        const handleClickDeep = () => setActionId(['onClickDeep', 'id'], 'xyz');
-
-        const handleClickUnsetShallow = () => unsetActionId('onClickShallow');
-        const handleClickUnsetDeep = () => unsetActionId(['onClickDeep', 'id']);
-
-        return (
-            <>
-                <button type="button" id="shallow" onClick={handleClickShallow} />
-                <button type="button" id="unsetshallow" onClick={handleClickUnsetShallow} />
-                <button type="button" id="deep" onClick={handleClickDeep} />
-                <button type="button" id="unsetdeep" onClick={handleClickUnsetDeep} />
-            </>
-        );
-    };
+    const Base = ({actionIds, setActionId, unsetActionId}) => (
+        <>
+            <div>
+                <span id="text-string-type">{typeof actionIds.string}</span>
+                <span id="text-string-value">{actionIds.string}</span>
+                <button type="button" id="button-set-string" onClick={() => setActionId('string', 'abc')} />
+                <button type="button" id="button-unset-string" onClick={() => unsetActionId('string')} />
+            </div>
+            <div>
+                <span id="text-parent-type">{typeof actionIds.parent}</span>
+                <span id="text-parent-value">{JSON.stringify(actionIds.parent)}</span>
+                <span id="text-child-type">{typeof actionIds.parent?.child}</span>
+                <span id="text-child-value">{actionIds.parent?.child}</span>
+                <button type="button" id="button-set-nested" onClick={() => setActionId(['parent', 'child'], 'xyz')} />
+                <button type="button" id="button-unset-nested" onClick={() => unsetActionId(['parent', 'child'])} />
+            </div>
+        </>
+    );
 
     const Enhanced = withAsyncActionStateHandler()(Base);
 
-    it('should pass actionIds, setActionId, unsetActionId as props additionally', () => {
-        const wrapper = mount(<Enhanced foo="bar" />);
+    it('should update actionIs by setActionId, and delete actionIds by unsetActionId.', () => {
+        render(<Enhanced />);
 
-        const desired = {
-            actionIds: {},
-            setActionId: expect.any(Function),
-            unsetActionId: expect.any(Function),
-            foo: 'bar',
-        };
+        fireEvent.click(document.getElementById('button-set-string'));
 
-        expect(wrapper.find(Base).props()).toMatchObject(desired);
+        expect(document.getElementById('text-string-type')).toHaveTextContent('string');
+        expect(document.getElementById('text-string-value')).toHaveTextContent('abc');
 
-        wrapper.unmount();
+        fireEvent.click(document.getElementById('button-unset-string'));
+
+        expect(document.getElementById('text-string-type')).toHaveTextContent('undefined');
+        expect(document.getElementById('text-string-value')).toHaveTextContent('');
     });
 
-    it('should update actionIs by setActionId, and delete actionIds by unsetActionId', () => {
-        const wrapper = mount(<Enhanced foo="bar" />);
+    it('should update actionIs by setActionId, and delete actionIds by unsetActionId.(nested)', () => {
+        render(<Enhanced />);
 
-        wrapper.find('#shallow').simulate('click');
+        fireEvent.click(document.getElementById('button-set-nested'));
 
-        expect(wrapper.find(Base).props().actionIds).toEqual({
-            'onClickShallow': 'abc',
-        });
+        expect(document.getElementById('text-parent-type')).toHaveTextContent('object');
+        expect(document.getElementById('text-parent-value')).toHaveTextContent('{"child":"xyz"}');
+        expect(document.getElementById('text-child-type')).toHaveTextContent('string');
+        expect(document.getElementById('text-child-value')).toHaveTextContent('xyz');
 
-        wrapper.find('#deep').simulate('click');
+        fireEvent.click(document.getElementById('button-unset-nested'));
 
-        expect(wrapper.find(Base).props().actionIds).toEqual({
-            'onClickShallow': 'abc',
-            'onClickDeep': {
-                id: 'xyz',
-            },
-        });
-
-        wrapper.find('#unsetshallow').simulate('click');
-
-        expect(wrapper.find(Base).props().actionIds).toEqual({
-            'onClickDeep': {
-                id: 'xyz',
-            },
-        });
-
-        wrapper.find('#unsetdeep').simulate('click');
-
-        expect(wrapper.find(Base).props().actionIds).toEqual({
-            'onClickDeep': {},
-        });
-
-        wrapper.unmount();
+        expect(document.getElementById('text-parent-type')).toHaveTextContent('object');
+        expect(document.getElementById('text-parent-value')).toHaveTextContent('{}');
+        expect(document.getElementById('text-child-type')).toHaveTextContent('undefined');
+        expect(document.getElementById('text-child-value')).toHaveTextContent('');
     });
-
 });
 
-// TODO How to test the context?
-// @see https://gist.github.com/dndhm/27ce047f4688f9d7968a495c96e31958
 describe('createAsyncActionContext', () => {
-    const {
-        withAsyncActionContextProvider,
-        withAsyncActionContextConsumer,
-    } = createAsyncActionContext();
+    const {withAsyncActionContextProvider, withAsyncActionContextConsumer} = createAsyncActionContext();
 
-    const Child = props => null;
+    const Child = props => (
+        <div>
+            <span id="actionIds">{'actionIds' in props ? 'Y' : 'N'}</span>
+            <span id="setActionId">{'setActionId' in props ? 'Y' : 'N'}</span>
+            <span id="unsetActionId">{'unsetActionId' in props ? 'Y' : 'N'}</span>
+        </div>
+    );
 
     const EnhancedChild = withAsyncActionContextConsumer(Child);
 
-    const Parent = props => (<EnhancedChild bar="bar" />);
+    const Parent = () => (<EnhancedChild bar="bar" />);
 
     const EnhancedParent = withAsyncActionContextProvider(Parent);
 
     it('should pass actionIds, setActionId, unsetActionId as props additionally by internal consumer', () => {
-        const wrapper = mount(
-            <EnhancedParent foo="foo" />
-        );
+        render(<EnhancedParent foo="foo" />);
 
-        const desired = {
-            actionIds: {},
-            setActionId: expect.any(Function),
-            unsetActionId: expect.any(Function),
-            bar: 'bar',
-        };
-
-        expect(wrapper.find(Child).props()).toMatchObject(desired);
-
-        wrapper.unmount();
+        expect(document.getElementById('actionIds')).toHaveTextContent('Y');
+        expect(document.getElementById('setActionId')).toHaveTextContent('Y');
+        expect(document.getElementById('unsetActionId')).toHaveTextContent('Y');
     });
 });
