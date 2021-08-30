@@ -1,6 +1,6 @@
 {
   "name": "redux-saga-mate",
-  "version": "2.0.5",
+  "version": "v3.0.0-alpha.1",
   "description": "Allow you building react and redux based web apps with less pain.",
   "keywords": [
     "react",
