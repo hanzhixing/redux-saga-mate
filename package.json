@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "is-plain-object": "^5.0.0",
+    "plainp": "file:../plainp",
     "ramda": "^0.28.0"
   },
   "devDependencies": {

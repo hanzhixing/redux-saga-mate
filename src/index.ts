@@ -15,6 +15,7 @@ import {
     uniq,
 } from 'ramda';
 import {AnyAction, Reducer, combineReducers} from '@reduxjs/toolkit';
+import type {PlainValue} from 'plainp';
 import {
     failWith,
     idOfAction,
@@ -22,7 +23,6 @@ import {
     isFinished,
     isValidAction,
     succeedWith,
-    PlainValue,
     Payload,
     HyperAction,
     AsyncAction,
@@ -94,11 +94,7 @@ export type OperationLocatorsMap = {
     [k in EntityOperation]?: OperationPayloadLocator[];
 };
 
-export type EntityReducer = <
-    S extends PlainValue,
-    T extends string,
-    P extends PlainValue,
->(state: S, action: HyperAction<T, P>) => S;
+export type EntityReducer = (state: any, action: any) => any;
 
 export type ActionOperationMap = {
     [k: string]: EntityOperation | EntityReducer;
